@@ -3,7 +3,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 HOST_NAME="com.tabagent.relay"
-WRAPPER_PATH="$SCRIPT_DIR/native-host-wrapper.sh"
+HOST_DIR="$HOME/Library/Application Support/TabAgent"
+WRAPPER_PATH="$HOST_DIR/native-host-wrapper.sh"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   MANIFEST_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
@@ -25,6 +26,17 @@ fi
 
 EXTENSION_ID="$1"
 
+if [ ! -d "$SCRIPT_DIR/node_modules/ws" ]; then
+  echo "Dependencies missing: run 'npm install' in $SCRIPT_DIR first."
+  exit 1
+fi
+
+mkdir -p "$HOST_DIR"
+rm -rf "$HOST_DIR/node_modules"
+cp "$SCRIPT_DIR/native-host.js" "$HOST_DIR/native-host.js"
+cp "$SCRIPT_DIR/native-host-wrapper.sh" "$HOST_DIR/native-host-wrapper.sh"
+cp -R "$SCRIPT_DIR/node_modules" "$HOST_DIR/node_modules"
+
 cat > "$MANIFEST_DIR/$HOST_NAME.json" << EOF
 {
   "name": "$HOST_NAME",
@@ -38,7 +50,7 @@ cat > "$MANIFEST_DIR/$HOST_NAME.json" << EOF
 EOF
 
 chmod +x "$WRAPPER_PATH"
-chmod +x "$SCRIPT_DIR/native-host.js"
+chmod +x "$HOST_DIR/native-host.js"
 
 echo "Native messaging host installed!"
 echo "Manifest: $MANIFEST_DIR/$HOST_NAME.json"
