@@ -8,7 +8,8 @@
     "scripting",
     "storage",
     "tabs",
-    "nativeMessaging"
+    "nativeMessaging",
+    "debugger"
   ],
   "host_permissions": [
     "<all_urls>"

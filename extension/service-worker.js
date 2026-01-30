@@ -9,6 +9,48 @@ const state = {
   lastNativeError: null,
 };
 
+// Dialog handling with chrome.debugger
+const pendingDialogs = new Map();
+const attachedDebuggerTabs = new Set();
+
+chrome.debugger.onEvent.addListener((source, method, params) => {
+  if (method === 'Page.javascriptDialogOpening') {
+    pendingDialogs.set(source.tabId, {
+      type: params.type,
+      message: params.message,
+      defaultPrompt: params.defaultPrompt
+    });
+  }
+});
+
+async function handleDialog(tabId, accept, promptText = '') {
+  if (!attachedDebuggerTabs.has(tabId)) {
+    try {
+      await chrome.debugger.attach({ tabId }, '1.3');
+      await chrome.debugger.sendCommand({ tabId }, 'Page.enable');
+      attachedDebuggerTabs.add(tabId);
+    } catch (e) {
+      return { ok: false, error: `Failed to attach debugger: ${e.message}` };
+    }
+  }
+
+  const pending = pendingDialogs.get(tabId);
+  if (!pending) {
+    return { ok: false, error: 'No dialog present' };
+  }
+
+  try {
+    await chrome.debugger.sendCommand({ tabId }, 'Page.handleJavaScriptDialog', {
+      accept,
+      promptText
+    });
+    pendingDialogs.delete(tabId);
+    return { ok: true, accepted: accept, dialogType: pending.type };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
 // Update badge for a tab
 function updateBadge(tabId) {
   const isActive = state.activatedTabs.has(tabId);
@@ -113,9 +155,77 @@ async function routeCommand(tabId, command) {
   }
 
   try {
+    // Handle evaluate - must use world: MAIN for page context access
+    if (command.action === 'evaluate') {
+      try {
+        const results = await chrome.scripting.executeScript({
+          target: { tabId },
+          world: 'MAIN',
+          func: (code) => {
+            try {
+              const result = eval(code);
+              if (typeof result === 'function') return { ok: true, result: '[Function]' };
+              if (result instanceof Node) return { ok: true, result: '[DOM Node]' };
+              return { ok: true, result };
+            } catch (e) {
+              return { ok: false, error: e.message };
+            }
+          },
+          args: [command.script]
+        });
+        const evalResult = results[0]?.result || { ok: false, error: 'No result' };
+        audit('evaluate', { tabId, script: command.script }, evalResult);
+        return evalResult;
+      } catch (error) {
+        const result = { ok: false, error: error.message };
+        audit('evaluate', { tabId, script: command.script }, result);
+        return result;
+      }
+    }
+
     // Handle screenshot specially - must be done in service worker
     if (command.action === 'screenshot') {
+      const { fullPage = false } = command;
       const tab = await chrome.tabs.get(tabId);
+
+      // Full page screenshot using chrome.debugger
+      if (fullPage) {
+        try {
+          await chrome.debugger.attach({ tabId }, '1.3');
+
+          const { result: layout } = await chrome.debugger.sendCommand(
+            { tabId },
+            'Page.getLayoutMetrics'
+          );
+
+          const { data } = await chrome.debugger.sendCommand(
+            { tabId },
+            'Page.captureScreenshot',
+            {
+              format: 'png',
+              captureBeyondViewport: true,
+              clip: {
+                x: 0,
+                y: 0,
+                width: layout.contentSize.width,
+                height: layout.contentSize.height,
+                scale: 1
+              }
+            }
+          );
+
+          await chrome.debugger.detach({ tabId });
+          audit('screenshot', { tabId, fullPage: true }, { ok: true });
+          return { ok: true, screenshot: 'data:image/png;base64,' + data, format: 'png' };
+        } catch (error) {
+          try { await chrome.debugger.detach({ tabId }); } catch {}
+          const result = { ok: false, error: error.message };
+          audit('screenshot', { tabId, fullPage: true }, result);
+          return result;
+        }
+      }
+
+      // Viewport screenshot (existing behavior)
       let previousActiveTabId = null;
       let dataUrl = null;
 
@@ -227,6 +337,13 @@ chrome.tabs.onActivated.addListener(({ tabId }) => {
 
 // Clean up when tabs are closed
 chrome.tabs.onRemoved.addListener((tabId) => {
+  // Clean up debugger state
+  if (attachedDebuggerTabs.has(tabId)) {
+    chrome.debugger.detach({ tabId }).catch(() => {});
+    attachedDebuggerTabs.delete(tabId);
+  }
+  pendingDialogs.delete(tabId);
+
   if (state.activatedTabs.has(tabId)) {
     state.activatedTabs.delete(tabId);
     audit('tab_closed', { tabId }, { ok: true });
@@ -298,6 +415,10 @@ function connectNativeHost() {
             result = { ok: true, log: state.auditLog.slice(-100) };
             break;
 
+          case 'dialog':
+            result = await handleDialog(tabId, params.accept, params.promptText);
+            break;
+
           case 'snapshot':
           case 'screenshot':
           case 'click':
@@ -308,6 +429,10 @@ function connectNativeHost() {
           case 'hover':
           case 'scroll':
           case 'navigate':
+          case 'evaluate':
+          case 'wait':
+          case 'scrollintoview':
+          case 'batchfill':
             result = await routeCommand(tabId, { action, ...params });
             break;
 

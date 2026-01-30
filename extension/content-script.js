@@ -274,7 +274,7 @@ if (window.__tabAgent_contentScriptLoaded) {
   }
 
   async function executeType(params) {
-    const { ref, text } = params;
+    const { ref, text, submit = false } = params;
     const element = getElementByRef(ref);
 
     if (!element) {
@@ -296,7 +296,17 @@ if (window.__tabAgent_contentScriptLoaded) {
       await new Promise(r => setTimeout(r, 10));
     }
 
-    return { ok: true, ref, typed: text };
+    // Handle submit if requested
+    if (submit) {
+      element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+      element.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+
+      // Also try form submit
+      const form = element.closest('form');
+      if (form) form.requestSubmit();
+    }
+
+    return { ok: true, ref, typed: text, submitted: submit };
   }
 
   async function executeFill(params) {
@@ -384,6 +394,52 @@ if (window.__tabAgent_contentScriptLoaded) {
     return { ok: true, direction, scrollY: window.scrollY };
   }
 
+  // Wait for condition (text, selector, or timeout)
+  async function executeWait(params) {
+    const { text, selector, timeout = 30000 } = params;
+    const start = Date.now();
+
+    while (Date.now() - start < timeout) {
+      if (text && document.body.innerText.includes(text)) {
+        return { ok: true, found: 'text' };
+      }
+      if (selector && document.querySelector(selector)) {
+        return { ok: true, found: 'selector' };
+      }
+      await new Promise(r => setTimeout(r, 100));
+    }
+
+    return { ok: false, error: 'Timeout waiting for condition' };
+  }
+
+  // Scroll element into view
+  async function executeScrollIntoView(params) {
+    const { ref } = params;
+    const element = getElementByRef(ref);
+
+    if (!element) {
+      return { ok: false, error: `Element ${ref} not found` };
+    }
+
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    await new Promise(r => setTimeout(r, 300));
+
+    return { ok: true, ref };
+  }
+
+  // Batch fill multiple fields
+  async function executeBatchFill(params) {
+    const { fields } = params;
+    const results = [];
+
+    for (const field of fields) {
+      const result = await executeFill({ ref: field.ref, value: field.value });
+      results.push({ ref: field.ref, ...result });
+    }
+
+    return { ok: results.every(r => r.ok), results };
+  }
+
   async function executeNavigate(params) {
     const { url } = params;
     window.location.href = url;
@@ -427,6 +483,15 @@ if (window.__tabAgent_contentScriptLoaded) {
           break;
         case 'scroll':
           result = await executeScroll(params);
+          break;
+        case 'wait':
+          result = await executeWait(params);
+          break;
+        case 'scrollintoview':
+          result = await executeScrollIntoView(params);
+          break;
+        case 'batchfill':
+          result = await executeBatchFill(params);
           break;
         case 'navigate':
           result = await executeNavigate(params);
