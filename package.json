@@ -1,0 +1,25 @@
+{
+  "name": "tab-agent",
+  "version": "0.2.0",
+  "description": "Browser control for Claude Code and Codex via WebSocket",
+  "bin": {
+    "tab-agent": "./bin/tab-agent.js"
+  },
+  "main": "relay/server.js",
+  "scripts": {
+    "start": "node relay/server.js"
+  },
+  "files": [
+    "bin/",
+    "cli/",
+    "relay/",
+    "skills/",
+    "extension/"
+  ],
+  "dependencies": {
+    "ws": "^8.16.0"
+  },
+  "keywords": ["chrome", "extension", "browser", "automation", "claude", "codex"],
+  "repository": "https://github.com/DrHB/tab-agent",
+  "license": "MIT"
+}
