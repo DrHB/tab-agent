@@ -1,5 +1,4 @@
 .DS_Store
-docs/
 node_modules/
 *.log
 package-lock.json
