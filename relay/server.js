@@ -20,6 +20,26 @@ const wss = new WebSocket.Server({ server: httpServer });
 let extensionConnection = null;
 const pendingRequests = new Map();
 
+function safeParse(data, label) {
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    console.warn(`Invalid JSON from ${label}:`, error);
+    return null;
+  }
+}
+
+function failPendingRequests(reason) {
+  for (const [id, pending] of pendingRequests.entries()) {
+    try {
+      pending.ws.send(JSON.stringify({ id: pending.clientId, ok: false, error: reason }));
+    } catch (error) {
+      console.warn('Failed to notify pending request:', error);
+    }
+    pendingRequests.delete(id);
+  }
+}
+
 wss.on('connection', (ws, req) => {
   const isExtension = req.headers['x-client-type'] === 'extension';
 
@@ -28,7 +48,10 @@ wss.on('connection', (ws, req) => {
     extensionConnection = ws;
 
     ws.on('message', (data) => {
-      const message = JSON.parse(data);
+      const message = safeParse(data, 'extension');
+      if (!message || typeof message.id === 'undefined') {
+        return;
+      }
       const { id, ...response } = message;
 
       const pending = pendingRequests.get(id);
@@ -41,13 +64,17 @@ wss.on('connection', (ws, req) => {
     ws.on('close', () => {
       console.log('Extension disconnected');
       extensionConnection = null;
+      failPendingRequests('Extension disconnected');
     });
 
   } else {
     console.log('Skill client connected');
 
     ws.on('message', async (data) => {
-      const message = JSON.parse(data);
+      const message = safeParse(data, 'client');
+      if (!message || typeof message.id === 'undefined') {
+        return;
+      }
       const { id, ...command } = message;
 
       console.log(`Command: ${command.action}`, command);
@@ -65,6 +92,11 @@ wss.on('connection', (ws, req) => {
 
     ws.on('close', () => {
       console.log('Skill client disconnected');
+      for (const [id, pending] of pendingRequests.entries()) {
+        if (pending.ws === ws) {
+          pendingRequests.delete(id);
+        }
+      }
     });
   }
 });

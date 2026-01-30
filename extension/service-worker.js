@@ -29,24 +29,48 @@ function isTabActivated(tabId) {
   return state.activatedTabs.has(tabId);
 }
 
+// Ensure content script is ready in the tab
+async function ensureContentScript(tabId) {
+  try {
+    await chrome.tabs.sendMessage(tabId, { action: '__ping' });
+    return { ok: true, alreadyLoaded: true };
+  } catch (error) {
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        files: ['content-script.js']
+      });
+      return { ok: true, injected: true };
+    } catch (injectError) {
+      return { ok: false, error: injectError.message || 'Failed to inject content script' };
+    }
+  }
+}
+
 // Activate a tab for control
 async function activateTab(tabId) {
-  const tab = await chrome.tabs.get(tabId);
+  try {
+    const tab = await chrome.tabs.get(tabId);
+    const injectResult = await ensureContentScript(tabId);
+    if (!injectResult.ok) {
+      const result = { ok: false, error: injectResult.error };
+      audit('activate', { tabId, url: tab.url }, result);
+      return result;
+    }
 
-  // Inject content script
-  await chrome.scripting.executeScript({
-    target: { tabId },
-    files: ['content-script.js']
-  });
+    state.activatedTabs.set(tabId, {
+      url: tab.url,
+      title: tab.title,
+      activatedAt: new Date().toISOString(),
+    });
 
-  state.activatedTabs.set(tabId, {
-    url: tab.url,
-    title: tab.title,
-    activatedAt: new Date().toISOString(),
-  });
-
-  audit('activate', { tabId, url: tab.url }, { ok: true });
-  return { ok: true, tabId, url: tab.url, title: tab.title };
+    audit('activate', { tabId, url: tab.url }, { ok: true });
+    return { ok: true, tabId, url: tab.url, title: tab.title };
+  } catch (error) {
+    const result = { ok: false, error: error.message };
+    audit('activate', { tabId }, result);
+    return result;
+  }
 }
 
 // Deactivate a tab
@@ -74,10 +98,33 @@ async function routeCommand(tabId, command) {
   try {
     // Handle screenshot specially - must be done in service worker
     if (command.action === 'screenshot') {
-      const dataUrl = await chrome.tabs.captureVisibleTab(null, {
-        format: 'png',
-        quality: 90
-      });
+      const tab = await chrome.tabs.get(tabId);
+      let previousActiveTabId = null;
+      let dataUrl = null;
+
+      try {
+        if (!tab.active) {
+          const [activeTab] = await chrome.tabs.query({ active: true, windowId: tab.windowId });
+          if (activeTab && activeTab.id !== tabId) {
+            previousActiveTabId = activeTab.id;
+          }
+          await chrome.tabs.update(tabId, { active: true });
+          await new Promise(r => setTimeout(r, 150));
+        }
+
+        dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
+          format: 'png',
+          quality: 90
+        });
+      } finally {
+        if (previousActiveTabId && previousActiveTabId !== tabId) {
+          try {
+            await chrome.tabs.update(previousActiveTabId, { active: true });
+          } catch (restoreError) {
+            console.warn('Failed to restore active tab after screenshot:', restoreError);
+          }
+        }
+      }
 
       audit('screenshot', { tabId }, { ok: true });
 
@@ -87,6 +134,13 @@ async function routeCommand(tabId, command) {
         format: 'png',
         encoding: 'base64'
       };
+    }
+
+    const injectResult = await ensureContentScript(tabId);
+    if (!injectResult.ok) {
+      const result = { ok: false, error: injectResult.error };
+      audit(command.action, { tabId, ...command }, result);
+      return result;
     }
 
     const response = await chrome.tabs.sendMessage(tabId, command);
@@ -148,6 +202,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     const info = state.activatedTabs.get(tabId);
     info.url = changeInfo.url;
     info.title = tab.title;
+  }
+  if (changeInfo.status === 'complete' && state.activatedTabs.has(tabId)) {
+    ensureContentScript(tabId);
   }
 });
 
