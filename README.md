@@ -1,13 +1,13 @@
 # Tab Agent
 
-Browser control for Claude Code and Codex via WebSocket.
+Secure tab-level browser control for Claude Code and Codex — only the tabs you explicitly activate, not your entire browser.
 
 ## Quick Start
 
 ### 1. Install Extension
 
 ```bash
-git clone https://github.com/yourname/tab-agent
+git clone https://github.com/DrHB/tab-agent
 cd tab-agent
 ```
 
