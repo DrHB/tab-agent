@@ -5,6 +5,8 @@
 const state = {
   activatedTabs: new Map(), // tabId -> { url, title, activatedAt }
   auditLog: [],
+  nativeConnected: false,
+  lastNativeError: null,
 };
 
 // Log all actions for audit trail
@@ -163,7 +165,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     switch (action) {
       case 'ping':
-        result = { ok: true, message: 'pong', version: '0.1.0' };
+        result = {
+          ok: true,
+          message: 'pong',
+          version: '0.1.0',
+          nativeConnected: state.nativeConnected,
+          lastNativeError: state.lastNativeError
+        };
         break;
 
       case 'activate':
@@ -212,12 +220,30 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 let nativePort = null;
 
 function connectNativeHost() {
+  console.log('Attempting to connect to native host...');
+
   try {
     nativePort = chrome.runtime.connectNative('com.tabagent.relay');
+    console.log('connectNative called, port created');
 
     nativePort.onMessage.addListener(async (message) => {
+      console.log('Received from native host:', message);
+
+      if (message.type === 'connected') {
+        console.log('Native host connected to relay server');
+        state.nativeConnected = true;
+        state.lastNativeError = null;
+        return;
+      }
+
+      if (message.type === 'error') {
+        console.error('Native host error:', message.error);
+        return;
+      }
+
       if (message.type === 'command') {
         const { id, action, tabId, ...params } = message;
+        console.log(`Processing command: ${action}`, { tabId, params });
 
         let result;
 
@@ -259,17 +285,23 @@ function connectNativeHost() {
             result = { ok: false, error: `Unknown action: ${action}` };
         }
 
+        console.log(`Command ${action} result:`, result);
         nativePort.postMessage({ type: 'response', id, ...result });
       }
     });
 
     nativePort.onDisconnect.addListener(() => {
-      console.log('Native host disconnected');
+      const error = chrome.runtime.lastError;
+      const errorMsg = error ? error.message : null;
+      console.log('Native host disconnected', errorMsg ? `Error: ${errorMsg}` : '');
+      state.nativeConnected = false;
+      state.lastNativeError = errorMsg;
       nativePort = null;
+      console.log('Will retry connection in 5 seconds...');
       setTimeout(connectNativeHost, 5000);
     });
 
-    console.log('Connected to native host');
+    console.log('Native messaging listeners registered');
 
   } catch (error) {
     console.error('Failed to connect to native host:', error);
@@ -278,6 +310,7 @@ function connectNativeHost() {
 }
 
 // Start native messaging connection
+console.log('Starting native messaging connection...');
 connectNativeHost();
 
 console.log('Tab Agent service worker started');

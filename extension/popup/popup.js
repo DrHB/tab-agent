@@ -67,14 +67,21 @@ async function checkConnection() {
   try {
     const response = await chrome.runtime.sendMessage({ action: 'ping' });
     if (response && response.ok) {
-      statusEl.className = 'status connected';
-      statusEl.textContent = 'Connected - Ready for commands';
+      if (response.nativeConnected) {
+        statusEl.className = 'status connected';
+        statusEl.textContent = 'Connected - Ready for commands';
+      } else {
+        statusEl.className = 'status disconnected';
+        const errorMsg = response.lastNativeError || 'Native host not connected';
+        statusEl.textContent = errorMsg;
+        statusEl.title = errorMsg;
+      }
     } else {
       throw new Error('No response');
     }
   } catch (error) {
     statusEl.className = 'status disconnected';
-    statusEl.textContent = 'Extension ready - Start relay server';
+    statusEl.textContent = 'Extension error';
   }
 }
 
