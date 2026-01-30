@@ -37,8 +37,9 @@ cp skills/codex/tab-agent.md ~/.codex/skills/
 
 ### 4. Use
 
-1. Click Tab Agent icon → **Activate** on target tab
+1. Click Tab Agent icon on any tab to activate (turns green **ON**)
 2. Ask your AI: "Use tab-agent to search Google for 'hello world'"
+3. Click icon again to deactivate
 
 ## Commands
 

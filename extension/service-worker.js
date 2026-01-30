@@ -9,6 +9,17 @@ const state = {
   lastNativeError: null,
 };
 
+// Update badge for a tab
+function updateBadge(tabId) {
+  const isActive = state.activatedTabs.has(tabId);
+  chrome.action.setBadgeText({ tabId, text: isActive ? 'ON' : '' });
+  chrome.action.setBadgeBackgroundColor({ tabId, color: isActive ? '#22c55e' : '#666' });
+  chrome.action.setTitle({
+    tabId,
+    title: isActive ? 'Tab Agent - Active (click to deactivate)' : 'Tab Agent - Click to activate'
+  });
+}
+
 // Log all actions for audit trail
 function audit(action, data, result) {
   const entry = {
@@ -66,6 +77,9 @@ async function activateTab(tabId) {
       activatedAt: new Date().toISOString(),
     });
 
+    // Update badge
+    updateBadge(tabId);
+
     audit('activate', { tabId, url: tab.url }, { ok: true });
     return { ok: true, tabId, url: tab.url, title: tab.title };
   } catch (error) {
@@ -78,6 +92,7 @@ async function activateTab(tabId) {
 // Deactivate a tab
 function deactivateTab(tabId) {
   state.activatedTabs.delete(tabId);
+  updateBadge(tabId);
   audit('deactivate', { tabId }, { ok: true });
   return { ok: true };
 }
@@ -196,6 +211,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
+// Handle extension icon click - toggle activation
+chrome.action.onClicked.addListener(async (tab) => {
+  if (state.activatedTabs.has(tab.id)) {
+    deactivateTab(tab.id);
+  } else {
+    await activateTab(tab.id);
+  }
+});
+
+// Update badge when switching tabs
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  updateBadge(tabId);
+});
+
 // Clean up when tabs are closed
 chrome.tabs.onRemoved.addListener((tabId) => {
   if (state.activatedTabs.has(tabId)) {
@@ -213,6 +242,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
   if (changeInfo.status === 'complete' && state.activatedTabs.has(tabId)) {
     ensureContentScript(tabId);
+    updateBadge(tabId);
   }
 });
 

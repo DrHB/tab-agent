@@ -128,7 +128,17 @@ if (window.__tabAgent_contentScriptLoaded) {
       return true;
     }
 
-    function buildSnapshot(element, depth = 0, maxDepth = 10) {
+    function getDirectText(element) {
+      let text = '';
+      for (const node of element.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          text += node.textContent;
+        }
+      }
+      return text.trim();
+    }
+
+    function buildSnapshot(element, depth = 0, maxDepth = 15) {
       if (depth > maxDepth) return [];
       if (!isVisible(element)) return [];
 
@@ -140,18 +150,32 @@ if (window.__tabAgent_contentScriptLoaded) {
       const includedRoles = [
         'link', 'button', 'textbox', 'checkbox', 'radio', 'combobox',
         'heading', 'img', 'navigation', 'main', 'form', 'listitem',
-        'tab', 'tabpanel', 'menu', 'menuitem', 'dialog', 'alert'
+        'tab', 'tabpanel', 'menu', 'menuitem', 'dialog', 'alert',
+        'article', 'paragraph'
       ];
 
-      const shouldInclude = includedRoles.includes(role) || interactive;
+      // Check for data-testid (useful for Twitter/X)
+      const testId = element.getAttribute('data-testid');
+      const isTweet = testId && (testId.includes('tweet') || testId.includes('tweetText'));
 
-      if (shouldInclude && (name || interactive)) {
+      // Get direct text content for text-heavy elements
+      const directText = getDirectText(element);
+      const hasSignificantText = directText.length > 20;
+
+      const shouldInclude = includedRoles.includes(role) || interactive || isTweet || hasSignificantText;
+
+      if (shouldInclude && (name || interactive || directText || isTweet)) {
         const ref = nextRef();
         storeRef(ref, element);
 
         let line = `[${ref}] ${role}`;
-        if (name) {
-          line += ` "${name.substring(0, 80)}"`;
+        if (isTweet) {
+          line = `[${ref}] tweet`;
+        }
+
+        const displayText = name || directText;
+        if (displayText) {
+          line += ` "${displayText.substring(0, 200).replace(/\n/g, ' ')}"`;
         }
 
         if (element.tagName === 'INPUT') {
@@ -188,6 +212,30 @@ if (window.__tabAgent_contentScriptLoaded) {
       const root = document.body || document.documentElement;
       if (root) {
         lines.push(...buildSnapshot(root));
+      }
+
+      // Special handling for Twitter/X - find tweets by data-testid
+      const tweetElements = document.querySelectorAll('[data-testid="tweet"], [data-testid="tweetText"], article[role="article"]');
+      if (tweetElements.length > 0) {
+        lines.push('');
+        lines.push('== Tweets ==');
+        tweetElements.forEach((el, i) => {
+          const ref = nextRef();
+          storeRef(ref, el);
+
+          // Get tweet text content
+          const tweetText = el.querySelector('[data-testid="tweetText"]');
+          const text = tweetText ? tweetText.textContent.trim() : el.textContent.trim();
+
+          // Get author if available
+          const authorLink = el.querySelector('a[href^="/"][role="link"]');
+          const author = authorLink ? authorLink.textContent : '';
+
+          if (text && text.length > 10) {
+            const cleanText = text.substring(0, 300).replace(/\n+/g, ' ').replace(/\s+/g, ' ');
+            lines.push(`[${ref}] tweet ${author ? 'by ' + author + ': ' : ''}"${cleanText}"`);
+          }
+        });
       }
 
       return {
