@@ -3,6 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 HOST_NAME="com.tabagent.relay"
+WRAPPER_PATH="$SCRIPT_DIR/native-host-wrapper.sh"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   MANIFEST_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
@@ -28,7 +29,7 @@ cat > "$MANIFEST_DIR/$HOST_NAME.json" << EOF
 {
   "name": "$HOST_NAME",
   "description": "Tab Agent Native Messaging Host",
-  "path": "$SCRIPT_DIR/native-host.js",
+  "path": "$WRAPPER_PATH",
   "type": "stdio",
   "allowed_origins": [
     "chrome-extension://$EXTENSION_ID/"
@@ -36,6 +37,7 @@ cat > "$MANIFEST_DIR/$HOST_NAME.json" << EOF
 }
 EOF
 
+chmod +x "$WRAPPER_PATH"
 chmod +x "$SCRIPT_DIR/native-host.js"
 
 echo "Native messaging host installed!"
