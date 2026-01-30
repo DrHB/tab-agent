@@ -4,14 +4,20 @@ Secure tab-level browser control for Claude Code and Codex — only the tabs you
 
 ## Install
 
-### 1. Load Extension
+### 1. Clone & Load Extension
+```bash
+git clone https://github.com/DrHB/tab-agent
+cd tab-agent
+```
+
 1. Open `chrome://extensions`
 2. Enable **Developer mode**
 3. Click **Load unpacked** → select `extension/` folder
 
 ### 2. Setup
 ```bash
-npx tab-agent setup
+npm install
+node bin/tab-agent.js setup
 ```
 
 That's it! The setup auto-detects your extension and configures everything.
@@ -43,8 +49,8 @@ That's it! The setup auto-detects your extension and configures everything.
 ## Manual Commands
 
 ```bash
-npx tab-agent status  # Check configuration
-npx tab-agent start   # Start relay manually
+node bin/tab-agent.js status  # Check configuration
+node bin/tab-agent.js start   # Start relay manually
 ```
 
 ## Architecture

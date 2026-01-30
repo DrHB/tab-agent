@@ -10,7 +10,7 @@ description: Browser control via WebSocket
 ## Start Relay
 
 ```bash
-curl -s http://localhost:9876/health || (npx tab-agent start &)
+curl -s http://localhost:9876/health || (cd ~/tab-agent && node bin/tab-agent.js start &)
 ```
 
 ## Commands
