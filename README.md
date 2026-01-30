@@ -2,61 +2,55 @@
 
 Secure tab-level browser control for Claude Code and Codex — only the tabs you explicitly activate, not your entire browser.
 
-## Quick Start
+## Install
 
-### 1. Install Extension
-
-```bash
-git clone https://github.com/DrHB/tab-agent
-cd tab-agent
-```
-
+### 1. Load Extension
 1. Open `chrome://extensions`
 2. Enable **Developer mode**
-3. Click **Load unpacked** → select `extension/`
-4. Copy your **Extension ID**
+3. Click **Load unpacked** → select `extension/` folder
 
-### 2. Setup Relay
-
+### 2. Setup
 ```bash
-cd relay
-npm install
-./install-native-host.sh <extension-id>
-npm start
+npx tab-agent setup
 ```
 
-### 3. Install Skill
+That's it! The setup auto-detects your extension and configures everything.
 
-```bash
-# Claude Code
-cp skills/claude-code/tab-agent.md ~/.claude/skills/
+## Use
 
-# Codex
-cp skills/codex/tab-agent.md ~/.codex/skills/
-```
-
-### 4. Use
-
-1. Click Tab Agent icon on any tab to activate (turns green **ON**)
-2. Ask your AI: "Use tab-agent to search Google for 'hello world'"
-3. Click icon again to deactivate
+1. Click Tab Agent icon on any tab (turns green = active)
+2. Ask Claude/Codex: "Use tab-agent to search Google for 'hello world'"
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| snapshot | Get AI-readable page |
-| click | Click by ref |
-| type | Type text |
-| fill | Fill form field |
-| press | Press key |
-| navigate | Go to URL |
-| screenshot | Capture image |
+| `tabs` | List activated tabs |
+| `snapshot` | Get AI-readable page with refs [e1], [e2]... |
+| `screenshot` | Capture viewport (or `fullPage: true` for full page) |
+| `click` | Click element by ref |
+| `fill` | Fill form field |
+| `type` | Type text (with optional `submit: true`) |
+| `press` | Press key (Enter, Escape, Tab, Arrow*) |
+| `scroll` | Scroll page |
+| `scrollintoview` | Scroll element into view |
+| `navigate` | Go to URL |
+| `wait` | Wait for text or selector |
+| `evaluate` | Run JavaScript in page context |
+| `batchfill` | Fill multiple fields at once |
+| `dialog` | Handle alert/confirm/prompt |
+
+## Manual Commands
+
+```bash
+npx tab-agent status  # Check configuration
+npx tab-agent start   # Start relay manually
+```
 
 ## Architecture
 
 ```
-Claude/Codex → WebSocket → Relay Server → Native Messaging → Extension → Content Script → DOM
+Claude/Codex → WebSocket:9876 → Relay → Native Messaging → Extension → DOM
 ```
 
 ## License
