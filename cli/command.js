@@ -182,16 +182,8 @@ function printScreenshot(msg) {
     console.error('Error:', msg.error);
     return;
   }
-  // Save to file
-  const fs = require('fs');
-  const filename = `/tmp/tab-agent-screenshot-${Date.now()}.png`;
-  const base64Data = msg.screenshot.replace(/^data:image\/png;base64,/, '');
-  fs.writeFileSync(filename, base64Data, 'base64');
-  console.log(`Screenshot saved: ${filename}`);
-
-  // Try to open it
-  const { exec } = require('child_process');
-  exec(`open "${filename}"`, () => {});
+  // Output base64 directly - no file, no auto-open
+  console.log(msg.screenshot);
 }
 
 function printResult(msg) {
