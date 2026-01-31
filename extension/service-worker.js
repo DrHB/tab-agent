@@ -191,34 +191,23 @@ async function routeCommand(tabId, command) {
       // Full page screenshot using chrome.debugger
       if (fullPage) {
         try {
-          await chrome.debugger.attach({ tabId }, '1.3');
-          await chrome.debugger.sendCommand({ tabId }, 'Page.enable');
+          // Try to detach first in case previous attempt left debugger attached
+          try { await chrome.debugger.detach({ tabId }); } catch {}
 
-          const layout = await chrome.debugger.sendCommand(
-            { tabId },
-            'Page.getLayoutMetrics'
-          );
+          await chrome.debugger.attach({ tabId }, '1.3');
 
           const screenshot = await chrome.debugger.sendCommand(
             { tabId },
             'Page.captureScreenshot',
             {
               format: 'png',
-              captureBeyondViewport: true,
-              clip: {
-                x: 0,
-                y: 0,
-                width: layout.contentSize.width,
-                height: layout.contentSize.height,
-                scale: 1
-              }
+              captureBeyondViewport: true
             }
           );
-          const data = screenshot.data;
 
           await chrome.debugger.detach({ tabId });
           audit('screenshot', { tabId, fullPage: true }, { ok: true });
-          return { ok: true, screenshot: 'data:image/png;base64,' + data, format: 'png' };
+          return { ok: true, screenshot: 'data:image/png;base64,' + screenshot.data, format: 'png' };
         } catch (error) {
           try { await chrome.debugger.detach({ tabId }); } catch {}
           const result = { ok: false, error: error.message };
