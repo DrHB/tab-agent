@@ -99,35 +99,50 @@ function installSkills() {
   const skillSource = path.join(packageDir, 'skills');
 
   // Claude Code - always install
-  const claudeSkillDir = path.join(home, '.claude', 'skills');
-  const claudeSkillPath = path.join(claudeSkillDir, 'tab-agent.md');
+  // Expected structure: ~/.claude/skills/tab-agent/SKILL.md
+  const claudeSkillDir = path.join(home, '.claude', 'skills', 'tab-agent');
+  const claudeSkillPath = path.join(claudeSkillDir, 'SKILL.md');
+
+  // Remove old flat file if it exists (from previous versions)
+  const oldClaudeSkillPath = path.join(home, '.claude', 'skills', 'tab-agent.md');
+  if (fs.existsSync(oldClaudeSkillPath)) {
+    fs.unlinkSync(oldClaudeSkillPath);
+    console.log('  Removed old skill file format');
+  }
+
   fs.mkdirSync(claudeSkillDir, { recursive: true });
 
   if (fs.existsSync(claudeSkillPath)) {
-    console.log(`  Updating existing skill at ${claudeSkillPath}`);
+    console.log(`  Updating existing skill at ${claudeSkillDir}`);
   }
   fs.copyFileSync(
-    path.join(skillSource, 'claude-code', 'tab-agent.md'),
+    path.join(skillSource, 'claude-code', 'tab-agent', 'SKILL.md'),
     claudeSkillPath
   );
   console.log('✓ Installed Claude Code skill');
 
-  // Codex (only if .codex exists)
-  const codexDir = path.join(home, '.codex');
-  if (fs.existsSync(codexDir)) {
-    const codexSkillDir = path.join(codexDir, 'skills');
-    const codexSkillPath = path.join(codexSkillDir, 'tab-agent.md');
-    fs.mkdirSync(codexSkillDir, { recursive: true });
+  // Codex - always install (create .codex if needed)
+  // Expected structure: ~/.codex/skills/tab-agent/SKILL.md
+  const codexSkillDir = path.join(home, '.codex', 'skills', 'tab-agent');
+  const codexSkillPath = path.join(codexSkillDir, 'SKILL.md');
 
-    if (fs.existsSync(codexSkillPath)) {
-      console.log(`  Updating existing skill at ${codexSkillPath}`);
-    }
-    fs.copyFileSync(
-      path.join(skillSource, 'codex', 'tab-agent.md'),
-      codexSkillPath
-    );
-    console.log('✓ Installed Codex skill');
+  // Remove old flat file if it exists (from previous versions)
+  const oldCodexSkillPath = path.join(home, '.codex', 'skills', 'tab-agent.md');
+  if (fs.existsSync(oldCodexSkillPath)) {
+    fs.unlinkSync(oldCodexSkillPath);
+    console.log('  Removed old Codex skill file format');
   }
+
+  fs.mkdirSync(codexSkillDir, { recursive: true });
+
+  if (fs.existsSync(codexSkillPath)) {
+    console.log(`  Updating existing skill at ${codexSkillDir}`);
+  }
+  fs.copyFileSync(
+    path.join(skillSource, 'codex', 'tab-agent', 'SKILL.md'),
+    codexSkillPath
+  );
+  console.log('✓ Installed Codex skill');
 }
 
 setup().catch(console.error);
