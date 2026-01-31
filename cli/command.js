@@ -1,0 +1,208 @@
+// cli/command.js
+const WebSocket = require('ws');
+
+const COMMANDS = ['tabs', 'snapshot', 'screenshot', 'click', 'type', 'fill', 'press', 'scroll', 'navigate', 'wait', 'evaluate'];
+
+async function runCommand(args) {
+  const [command, ...params] = args;
+
+  if (!command || command === 'help') {
+    printHelp();
+    return;
+  }
+
+  if (!COMMANDS.includes(command)) {
+    console.error(`Unknown command: ${command}`);
+    console.error(`Available: ${COMMANDS.join(', ')}`);
+    process.exit(1);
+  }
+
+  const ws = new WebSocket('ws://localhost:9876');
+
+  const timeout = setTimeout(() => {
+    console.error('Connection timeout - is the relay running? Try: npx tab-agent start');
+    ws.close();
+    process.exit(1);
+  }, 5000);
+
+  ws.on('error', (err) => {
+    clearTimeout(timeout);
+    console.error('Connection failed:', err.message);
+    console.error('Make sure relay is running: npx tab-agent start');
+    process.exit(1);
+  });
+
+  ws.on('open', () => {
+    clearTimeout(timeout);
+
+    // First get tabs to find tabId
+    if (command === 'tabs') {
+      ws.send(JSON.stringify({ id: 1, action: 'tabs' }));
+    } else {
+      // Get active tab first, then run command
+      ws.send(JSON.stringify({ id: 0, action: 'tabs' }));
+    }
+  });
+
+  ws.on('message', (data) => {
+    const msg = JSON.parse(data);
+
+    // Handle tabs response
+    if (msg.id === 0) {
+      if (!msg.tabs || msg.tabs.length === 0) {
+        console.error('No active tabs. Click Tab Agent icon on a tab to activate it.');
+        ws.close();
+        process.exit(1);
+      }
+
+      const tabId = msg.tabs[0].tabId;
+      const payload = buildPayload(command, params, tabId);
+      ws.send(JSON.stringify({ id: 1, ...payload }));
+      return;
+    }
+
+    // Handle command response
+    if (msg.id === 1) {
+      if (command === 'tabs') {
+        printTabs(msg);
+      } else if (command === 'snapshot') {
+        printSnapshot(msg);
+      } else if (command === 'screenshot') {
+        printScreenshot(msg);
+      } else {
+        printResult(msg);
+      }
+      ws.close();
+      process.exit(msg.ok ? 0 : 1);
+    }
+  });
+}
+
+function buildPayload(command, params, tabId) {
+  const payload = { action: command, tabId };
+
+  switch (command) {
+    case 'click':
+      payload.ref = params[0];
+      break;
+    case 'type':
+      payload.ref = params[0];
+      payload.text = params.slice(1).join(' ');
+      if (params.includes('--submit')) {
+        payload.submit = true;
+        payload.text = payload.text.replace('--submit', '').trim();
+      }
+      break;
+    case 'fill':
+      payload.ref = params[0];
+      payload.value = params.slice(1).join(' ');
+      break;
+    case 'press':
+      payload.key = params[0];
+      break;
+    case 'scroll':
+      payload.direction = params[0] || 'down';
+      payload.amount = parseInt(params[1]) || 500;
+      break;
+    case 'navigate':
+      payload.url = params[0];
+      break;
+    case 'wait':
+      if (params[0]?.startsWith('.') || params[0]?.startsWith('#')) {
+        payload.selector = params[0];
+      } else {
+        payload.text = params.join(' ');
+      }
+      payload.timeout = parseInt(params.find(p => /^\d+$/.test(p))) || 5000;
+      break;
+    case 'evaluate':
+      payload.script = params.join(' ');
+      break;
+    case 'screenshot':
+      if (params.includes('--full') || params.includes('--fullPage')) {
+        payload.fullPage = true;
+      }
+      break;
+  }
+
+  return payload;
+}
+
+function printHelp() {
+  console.log(`
+tab-agent - Browser control commands
+
+Usage: npx tab-agent <command> [options]
+
+Commands:
+  tabs                      List active tabs
+  snapshot                  Get AI-readable page content
+  screenshot [--full]       Capture screenshot (--full for full page)
+  click <ref>               Click element (e.g., click e5)
+  type <ref> <text>         Type text into element
+  fill <ref> <value>        Fill form field
+  press <key>               Press key (Enter, Escape, Tab, etc.)
+  scroll <dir> [amount]     Scroll up/down (default: 500px)
+  navigate <url>            Go to URL
+  wait <text|selector>      Wait for text or element
+  evaluate <script>         Run JavaScript
+
+Examples:
+  npx tab-agent tabs
+  npx tab-agent snapshot
+  npx tab-agent click e5
+  npx tab-agent type e3 hello world
+  npx tab-agent navigate https://google.com
+  npx tab-agent screenshot --full
+`);
+}
+
+function printTabs(msg) {
+  if (!msg.ok) {
+    console.error('Error:', msg.error);
+    return;
+  }
+  console.log('Active tabs:\n');
+  msg.tabs.forEach((tab, i) => {
+    console.log(`  ${i + 1}. [${tab.tabId}] ${tab.title}`);
+    console.log(`     ${tab.url}\n`);
+  });
+}
+
+function printSnapshot(msg) {
+  if (!msg.ok) {
+    console.error('Error:', msg.error);
+    return;
+  }
+  console.log(msg.snapshot);
+}
+
+function printScreenshot(msg) {
+  if (!msg.ok) {
+    console.error('Error:', msg.error);
+    return;
+  }
+  // Save to file
+  const fs = require('fs');
+  const filename = `/tmp/tab-agent-screenshot-${Date.now()}.png`;
+  const base64Data = msg.screenshot.replace(/^data:image\/png;base64,/, '');
+  fs.writeFileSync(filename, base64Data, 'base64');
+  console.log(`Screenshot saved: ${filename}`);
+
+  // Try to open it
+  const { exec } = require('child_process');
+  exec(`open "${filename}"`, () => {});
+}
+
+function printResult(msg) {
+  if (!msg.ok) {
+    console.error('Error:', msg.error);
+    return;
+  }
+  console.log('OK');
+  if (msg.result !== undefined) {
+    console.log('Result:', msg.result);
+  }
+}
+
+module.exports = { runCommand };
