@@ -30,31 +30,33 @@ if (BROWSER_COMMANDS.includes(command)) {
 
 function showHelp() {
   console.log(`
-tab-agent - Browser control for Claude/Codex
+web-agent - Give LLMs full control of your browser
 
-Setup Commands:
-  setup    Auto-detect extension, register native host, install skills
+Setup:
+  setup    Auto-detect extension, configure native messaging
   start    Start the relay server
-  status   Check configuration status
+  status   Check configuration
 
-Browser Commands:
-  tabs                      List active tabs
-  snapshot                  Get AI-readable page content
-  screenshot [--full]       Capture screenshot
+Browser Control:
+  snapshot                  Get page content with refs [e1], [e2]...
   click <ref>               Click element (e.g., click e5)
-  type <ref> <text>         Type text into element
+  type <ref> <text>         Type into element
   fill <ref> <value>        Fill form field
-  press <key>               Press key (Enter, Escape, etc.)
+  press <key>               Press key (Enter, Escape, Tab)
   scroll <dir> [amount]     Scroll up/down
   navigate <url>            Go to URL
+  tabs                      List active tabs
   wait <text|selector>      Wait for text or element
-  evaluate <script>         Run JavaScript
+  screenshot [--full]       Capture page (fallback)
+
+Workflow: snapshot → click/type → snapshot → repeat
 
 Examples:
-  npx tab-agent setup
-  npx tab-agent snapshot
-  npx tab-agent click e5
-  npx tab-agent type e3 "hello world"
+  npx web-agent setup
+  npx web-agent snapshot
+  npx web-agent click e5
+  npx web-agent type e3 "hello world"
+  npx web-agent navigate "https://google.com"
 
 Version: ${require('../package.json').version}
 `);

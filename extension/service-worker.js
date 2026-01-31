@@ -1,5 +1,5 @@
 // service-worker.js
-// Tab Agent - Service Worker
+// Web Agent - Service Worker
 // Manages activated tabs and routes commands to content scripts
 
 const state = {
@@ -58,7 +58,7 @@ function updateBadge(tabId) {
   chrome.action.setBadgeBackgroundColor({ tabId, color: isActive ? '#22c55e' : '#666' });
   chrome.action.setTitle({
     tabId,
-    title: isActive ? 'Tab Agent - Active (click to deactivate)' : 'Tab Agent - Click to activate'
+    title: isActive ? 'Web Agent - Active (click to deactivate)' : 'Web Agent - Click to activate'
   });
 }
 
@@ -361,7 +361,7 @@ function connectNativeHost() {
   console.log('Attempting to connect to native host...');
 
   try {
-    nativePort = chrome.runtime.connectNative('com.tabagent.relay');
+    nativePort = chrome.runtime.connectNative('com.webagent.relay');
     console.log('connectNative called, port created');
 
     nativePort.onMessage.addListener(async (message) => {
@@ -459,4 +459,4 @@ function connectNativeHost() {
 console.log('Starting native messaging connection...');
 connectNativeHost();
 
-console.log('Tab Agent service worker started');
+console.log('Web Agent service worker started');

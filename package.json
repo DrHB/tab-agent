@@ -1,8 +1,9 @@
 {
-  "name": "tab-agent",
-  "version": "0.3.2",
-  "description": "Browser control for Claude Code and Codex via WebSocket",
+  "name": "web-agent",
+  "version": "0.1.0",
+  "description": "Give LLMs full control of your browser - secure, click-to-activate browser automation for Claude, Codex, and any AI",
   "bin": {
+    "web-agent": "./bin/tab-agent.js",
     "tab-agent": "./bin/tab-agent.js"
   },
   "main": "relay/server.js",
@@ -20,13 +21,27 @@
     "ws": "^8.16.0"
   },
   "keywords": [
-    "chrome",
-    "extension",
-    "browser",
-    "automation",
+    "web-agent",
+    "browser-automation",
+    "browser-control",
+    "ai-browser",
+    "llm-browser",
     "claude",
-    "codex"
+    "codex",
+    "openai",
+    "anthropic",
+    "chrome-extension",
+    "browser-agent",
+    "web-automation",
+    "ai-agent",
+    "mcp",
+    "puppeteer-alternative",
+    "playwright-alternative"
   ],
-  "repository": "https://github.com/DrHB/tab-agent",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AiGithubWebAgent/web-agent"
+  },
+  "homepage": "https://github.com/AiGithubWebAgent/web-agent#readme",
   "license": "MIT"
 }

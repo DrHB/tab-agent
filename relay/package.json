@@ -1,7 +1,7 @@
 {
-  "name": "tab-agent-relay",
+  "name": "web-agent-relay",
   "version": "0.1.0",
-  "description": "WebSocket relay for Tab Agent Chrome extension",
+  "description": "WebSocket relay for Web Agent Chrome extension",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

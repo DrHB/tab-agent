@@ -27,7 +27,7 @@ function checkRelayServer() {
 }
 
 async function status() {
-  console.log('Tab Agent Status\n');
+  console.log('Web Agent Status\n');
 
   // Check native host
   const home = os.homedir();
@@ -35,11 +35,11 @@ async function status() {
   let manifestPath;
 
   if (platform === 'darwin') {
-    manifestPath = path.join(home, 'Library/Application Support/Google/Chrome/NativeMessagingHosts/com.tabagent.relay.json');
+    manifestPath = path.join(home, 'Library/Application Support/Google/Chrome/NativeMessagingHosts/com.webagent.relay.json');
   } else if (platform === 'linux') {
-    manifestPath = path.join(home, '.config/google-chrome/NativeMessagingHosts/com.tabagent.relay.json');
+    manifestPath = path.join(home, '.config/google-chrome/NativeMessagingHosts/com.webagent.relay.json');
   } else if (platform === 'win32') {
-    manifestPath = path.join(home, 'AppData/Local/Google/Chrome/User Data/NativeMessagingHosts/com.tabagent.relay.json');
+    manifestPath = path.join(home, 'AppData/Local/Google/Chrome/User Data/NativeMessagingHosts/com.webagent.relay.json');
   }
 
   if (fs.existsSync(manifestPath)) {
@@ -47,15 +47,15 @@ async function status() {
     console.log('Native Host: Installed');
     console.log(`  Extension: ${manifest.allowed_origins[0]}`);
   } else {
-    console.log('Native Host: Not installed (run: npx tab-agent setup)');
+    console.log('Native Host: Not installed (run: npx web-agent setup)');
   }
 
   // Check skills
-  const claudeSkill = path.join(home, '.claude', 'skills', 'tab-agent.md');
-  const codexSkill = path.join(home, '.codex', 'skills', 'tab-agent.md');
+  const claudeSkill = path.join(home, '.claude', 'skills', 'web-agent.md');
+  const codexSkill = path.join(home, '.codex', 'skills', 'web-agent.md');
 
-  console.log(`\nClaude Skill: ${fs.existsSync(claudeSkill) ? 'Installed' : 'Not installed'} ${claudeSkill}`);
-  console.log(`Codex Skill:  ${fs.existsSync(codexSkill) ? 'Installed' : 'Not installed (optional)'} ${codexSkill}`);
+  console.log(`\nClaude Skill: ${fs.existsSync(claudeSkill) ? 'Installed' : 'Not installed'}`);
+  console.log(`Codex Skill:  ${fs.existsSync(codexSkill) ? 'Installed' : 'Not installed (optional)'}`);
 
   // Check relay server
   console.log('\nRelay Server:');

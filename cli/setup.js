@@ -5,7 +5,7 @@ const os = require('os');
 const { findTabAgentExtension, checkExistingManifest, promptForExtensionId } = require('./detect-extension');
 
 async function setup() {
-  console.log('Tab Agent Setup\n');
+  console.log('Web Agent Setup\n');
 
   // 1. Detect extension ID
   console.log('Detecting extension...');
@@ -21,7 +21,7 @@ async function setup() {
       console.log(`✓ Found existing config: ${extensionId}`);
     } else {
       console.log('✗ Could not auto-detect extension');
-      console.log('  Make sure Tab Agent is loaded in chrome://extensions\n');
+      console.log('  Make sure Web Agent is loaded in chrome://extensions\n');
       extensionId = await promptForExtensionId();
     }
   }
@@ -42,8 +42,8 @@ async function setup() {
 
   console.log('\n✓ Setup complete!\n');
   console.log('Usage:');
-  console.log('  1. Click Tab Agent icon on any tab (turns green)');
-  console.log('  2. Ask Claude/Codex: "Use tab-agent to search Google"');
+  console.log('  1. Click Web Agent icon on any tab (turns green)');
+  console.log('  2. Ask Claude/Codex: "Use web-agent to search Google"');
   console.log('\nThe relay server starts automatically when needed.');
 }
 
@@ -70,14 +70,14 @@ function installNativeHost(extensionId) {
 
   const wrapperPath = path.join(packageDir, 'relay', wrapperName);
   const manifest = {
-    name: 'com.tabagent.relay',
-    description: 'Tab Agent Native Messaging Host',
+    name: 'com.webagent.relay',
+    description: 'Web Agent Native Messaging Host',
     path: wrapperPath,
     type: 'stdio',
     allowed_origins: [`chrome-extension://${extensionId}/`]
   };
 
-  const manifestPath = path.join(manifestDir, 'com.tabagent.relay.json');
+  const manifestPath = path.join(manifestDir, 'com.webagent.relay.json');
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 
   // Make wrapper executable (Unix only)
@@ -88,7 +88,7 @@ function installNativeHost(extensionId) {
   // Windows: also set registry key
   if (platform === 'win32') {
     const { execSync } = require('child_process');
-    const regPath = 'HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.tabagent.relay';
+    const regPath = 'HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.webagent.relay';
     execSync(`reg add "${regPath}" /ve /t REG_SZ /d "${manifestPath}" /f`);
   }
 }
@@ -100,14 +100,14 @@ function installSkills() {
 
   // Claude Code - always install
   const claudeSkillDir = path.join(home, '.claude', 'skills');
-  const claudeSkillPath = path.join(claudeSkillDir, 'tab-agent.md');
+  const claudeSkillPath = path.join(claudeSkillDir, 'web-agent.md');
   fs.mkdirSync(claudeSkillDir, { recursive: true });
 
   if (fs.existsSync(claudeSkillPath)) {
     console.log(`  Updating existing skill at ${claudeSkillPath}`);
   }
   fs.copyFileSync(
-    path.join(skillSource, 'claude-code', 'tab-agent.md'),
+    path.join(skillSource, 'claude-code', 'web-agent.md'),
     claudeSkillPath
   );
   console.log('✓ Installed Claude Code skill');
@@ -116,14 +116,14 @@ function installSkills() {
   const codexDir = path.join(home, '.codex');
   if (fs.existsSync(codexDir)) {
     const codexSkillDir = path.join(codexDir, 'skills');
-    const codexSkillPath = path.join(codexSkillDir, 'tab-agent.md');
+    const codexSkillPath = path.join(codexSkillDir, 'web-agent.md');
     fs.mkdirSync(codexSkillDir, { recursive: true });
 
     if (fs.existsSync(codexSkillPath)) {
       console.log(`  Updating existing skill at ${codexSkillPath}`);
     }
     fs.copyFileSync(
-      path.join(skillSource, 'codex', 'tab-agent.md'),
+      path.join(skillSource, 'codex', 'web-agent.md'),
       codexSkillPath
     );
     console.log('✓ Installed Codex skill');

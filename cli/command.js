@@ -20,7 +20,7 @@ async function runCommand(args) {
   const ws = new WebSocket('ws://localhost:9876');
 
   const timeout = setTimeout(() => {
-    console.error('Connection timeout - is the relay running? Try: npx tab-agent start');
+    console.error('Connection timeout - is the relay running? Try: npx web-agent start');
     ws.close();
     process.exit(1);
   }, 5000);
@@ -28,7 +28,7 @@ async function runCommand(args) {
   ws.on('error', (err) => {
     clearTimeout(timeout);
     console.error('Connection failed:', err.message);
-    console.error('Make sure relay is running: npx tab-agent start');
+    console.error('Make sure relay is running: npx web-agent start');
     process.exit(1);
   });
 
@@ -130,30 +130,30 @@ function buildPayload(command, params, tabId) {
 
 function printHelp() {
   console.log(`
-tab-agent - Browser control commands
+web-agent - Give LLMs full control of your browser
 
-Usage: npx tab-agent <command> [options]
+Usage: npx web-agent <command> [options]
 
 Commands:
-  tabs                      List active tabs
-  snapshot                  Get AI-readable page content
-  screenshot [--full]       Capture screenshot (--full for full page)
+  snapshot                  Get page content with refs [e1], [e2]...
   click <ref>               Click element (e.g., click e5)
-  type <ref> <text>         Type text into element
+  type <ref> <text>         Type into element
   fill <ref> <value>        Fill form field
-  press <key>               Press key (Enter, Escape, Tab, etc.)
-  scroll <dir> [amount]     Scroll up/down (default: 500px)
+  press <key>               Press key (Enter, Escape, Tab)
+  scroll <dir> [amount]     Scroll up/down
   navigate <url>            Go to URL
+  tabs                      List active tabs
   wait <text|selector>      Wait for text or element
+  screenshot [--full]       Capture page (fallback)
   evaluate <script>         Run JavaScript
 
+Workflow: snapshot → click/type → snapshot → repeat
+
 Examples:
-  npx tab-agent tabs
-  npx tab-agent snapshot
-  npx tab-agent click e5
-  npx tab-agent type e3 hello world
-  npx tab-agent navigate https://google.com
-  npx tab-agent screenshot --full
+  npx web-agent snapshot
+  npx web-agent click e5
+  npx web-agent type e3 "hello world"
+  npx web-agent navigate "https://google.com"
 `);
 }
 

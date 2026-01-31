@@ -1,13 +1,16 @@
-# Tab Agent
+# Web Agent
 
-[![npm version](https://img.shields.io/npm/v/tab-agent.svg)](https://www.npmjs.com/package/tab-agent)
+[![npm version](https://img.shields.io/npm/v/web-agent.svg)](https://www.npmjs.com/package/web-agent)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Give Claude, Codex, or any LLM full control of your browser tabs** — securely, with click-to-activate permission.
+**Give LLMs full control of your browser** — securely, with click-to-activate permission.
+
+Works with Claude Code, Codex, ChatGPT, and any AI that can run shell commands.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   Claude Code   │────▶│  Relay Server   │────▶│    Extension    │
-│   Codex / LLM   │◀────│   (background)  │◀────│    (Chrome)     │
+│  Codex / GPT    │◀────│   (background)  │◀────│    (Chrome)     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                        │
                                                        ▼
@@ -17,163 +20,106 @@
                                              └───────────────────┘
 ```
 
-## Features
+## Why Web Agent?
 
 - **Full browser control** — navigate, click, type, scroll, screenshot, run JavaScript
-- **Uses your login sessions** — access authenticated sites (GitHub, Gmail, X) without sharing credentials
-- **Runs in background** — relay server starts automatically, works while you do other things
-- **Click-to-activate security** — only tabs you explicitly enable, your other tabs stay private
-- **AI-optimized snapshots** — pages converted to readable text with element refs `[e1]`, `[e2]`
-- **Works with any LLM** — Claude Code, Codex, or any tool that can run shell commands
-
----
+- **Uses your login sessions** — access GitHub, Gmail, X, Amazon without sharing credentials
+- **Runs in background** — relay starts automatically, works while you do other things
+- **Click-to-activate security** — only tabs you explicitly enable, others stay private
+- **AI-optimized snapshots** — pages converted to text with refs `[e1]`, `[e2]` for easy targeting
+- **Works with any LLM** — Claude, GPT, Codex, or custom agents
 
 ## Quick Start
 
 ```bash
-# 1. Clone and load extension
-git clone https://github.com/DrHB/tab-agent
-# → Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
+# 1. Install extension
+git clone https://github.com/AiGithubWebAgent/web-agent
+# Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
 
-# 2. Setup (auto-detects everything)
-npx tab-agent setup
+# 2. Setup
+npx web-agent setup
 
-# 3. Activate a tab & go!
-# → Click Tab Agent icon on any tab (turns green = active)
-# → Ask Claude: "Use tab-agent to search Google for 'hello world'"
+# 3. Activate & go
+# Click the extension icon on any tab (turns green)
+# Ask your AI: "Search Amazon for mechanical keyboards and find the best rated"
 ```
 
----
+## Example Tasks
 
-## Why Tab Agent?
+```bash
+# Research
+"Go to Hacker News and summarize the top 5 stories"
 
-### 🔒 Security First
+# Shopping (uses your login!)
+"Search Amazon for protein powder, filter by 4+ stars, find the best value"
 
-| | Tab Agent | Traditional Automation |
-|--|-----------|----------------------|
-| **Access** | Only tabs you activate | Entire browser |
-| **Visibility** | Green badge = active | Hidden/background |
-| **Sessions** | Uses your cookies | Requires re-login |
-| **Credentials** | Never shared | Often required |
+# Social Media
+"Check my GitHub notifications and list unread ones"
 
-**Click-to-activate model:** Your banking, email, and sensitive tabs stay completely isolated. You always see exactly which tabs the LLM can control.
+# Data Extraction
+"Get the titles and prices of the first 10 products on this page"
 
-### 🍪 Works With Your Login Sessions
+# Automation
+"Fill out this form with my details and submit"
+```
 
-Because Tab Agent runs as a Chrome extension:
+## Commands
 
-- **Uses your existing cookies** — no re-authentication needed
-- **Access any site you're logged into** — GitHub, X, Gmail, internal tools
-- **Works with SSO and 2FA** — enterprise apps, protected accounts
-- **No credential sharing** — your passwords stay in your browser
+```bash
+# Core workflow
+npx web-agent snapshot                # Get page content with refs [e1], [e2]...
+npx web-agent click <ref>             # Click element (e.g., click e5)
+npx web-agent type <ref> <text>       # Type into element
+npx web-agent fill <ref> <value>      # Fill form field
 
-### 🤖 LLM-Optimized
+# Navigation
+npx web-agent navigate <url>          # Go to URL
+npx web-agent scroll <dir> [amount]   # Scroll up/down
+npx web-agent press <key>             # Press key (Enter, Escape, Tab)
 
-- **Semantic snapshots** — pages converted to readable text with refs `[e1]`, `[e2]`
-- **Screenshot fallback** — for complex dynamic pages
-- **Simple targeting** — click/type using refs instead of fragile CSS selectors
+# Utilities
+npx web-agent tabs                    # List active tabs
+npx web-agent wait <text>             # Wait for text to appear
+npx web-agent screenshot              # Capture page (fallback for complex UIs)
+```
 
----
-
-## Example Use Cases
-
-**Web Research**
-> "Go to Hacker News and summarize the top 5 articles"
-
-**Authenticated Actions** (uses your session!)
-> "Check my GitHub notifications and list the unread ones"
-
-**Form Automation**
-> "Fill out this contact form with my details"
-
-**Data Extraction**
-> "Get the last 20 posts from my X timeline with author names"
-
-**Multi-step Workflows**
-> "Search Amazon for 'mechanical keyboard', filter by 4+ stars, and list the top 3"
-
----
+**Workflow:** `snapshot` → use refs → `click`/`type` → `snapshot` again → repeat
 
 ## Installation
 
-### Step 1: Load Extension
+### 1. Load Extension
 
 ```bash
-git clone https://github.com/DrHB/tab-agent
+git clone https://github.com/AiGithubWebAgent/web-agent
 ```
 
-1. Open `chrome://extensions` in your browser
-2. Enable **Developer mode** (toggle in top right)
+1. Open `chrome://extensions`
+2. Enable **Developer mode** (top right)
 3. Click **Load unpacked**
 4. Select the `extension/` folder
-5. You'll see the Tab Agent icon in your toolbar
 
-### Step 2: Run Setup
-
-```bash
-npx tab-agent setup
-```
-
-This automatically:
-- Detects your extension ID
-- Configures native messaging
-- Installs the Claude/Codex skill
-
-### Step 3: Activate & Use
-
-1. Navigate to any webpage
-2. **Click the Tab Agent icon** — it turns green (🟢 ON)
-3. Ask your LLM to interact with the page
-
----
-
-## Commands Reference
-
-### Navigation & Viewing
-| Command | Description |
-|---------|-------------|
-| `tabs` | List all activated tabs |
-| `navigate` | Go to a URL |
-| `snapshot` | Get page with element refs |
-| `screenshot` | Capture viewport image |
-| `screenshot --full` | Capture entire page |
-
-### Interaction
-| Command | Description |
-|---------|-------------|
-| `click` | Click element by ref |
-| `type` | Type text into element |
-| `fill` | Fill a form field |
-| `press` | Press a key (Enter, Escape, Tab, Arrows) |
-
-### Page Control
-| Command | Description |
-|---------|-------------|
-| `scroll` | Scroll up/down by amount |
-| `wait` | Wait for text or element to appear |
-| `evaluate` | Run JavaScript in page context |
-
----
-
-## CLI Usage
+### 2. Run Setup
 
 ```bash
-# Setup & Status
-npx tab-agent setup                   # Initial configuration
-npx tab-agent status                  # Check if everything works
-npx tab-agent start                   # Start relay server manually
-
-# Browser Commands
-npx tab-agent tabs                    # List active tabs
-npx tab-agent snapshot                # Get page content with refs
-npx tab-agent screenshot              # Capture viewport
-npx tab-agent screenshot --full       # Capture full page
-npx tab-agent click e5                # Click element
-npx tab-agent type e3 "hello"         # Type text
-npx tab-agent navigate "https://..."  # Go to URL
+npx web-agent setup
 ```
 
----
+This auto-detects your extension and configures everything.
+
+### 3. Activate Tabs
+
+Click the Web Agent icon on any tab you want to control. Green = active.
+
+## Security Model
+
+| Feature | Web Agent | Traditional Automation |
+|---------|-----------|----------------------|
+| **Access** | Only tabs you click to activate | Entire browser |
+| **Sessions** | Uses your cookies | Requires credentials |
+| **Visibility** | Green badge shows active tabs | Hidden/background |
+| **Control** | You choose what AI can access | Full access by default |
+
+Your banking, email, and sensitive tabs stay completely isolated unless you explicitly activate them.
 
 ## Supported Browsers
 
@@ -182,45 +128,34 @@ npx tab-agent navigate "https://..."  # Go to URL
 - Microsoft Edge
 - Chromium
 
-Setup automatically detects your browser.
-
----
-
 ## Troubleshooting
 
 **Extension not detected?**
-- Ensure `extension/` folder is loaded in chrome://extensions
-- Developer mode must be enabled
-- Try refreshing the extensions page
+- Make sure Developer mode is enabled in chrome://extensions
+- Reload the extension
 
-**Tab not responding?**
-- Click the Tab Agent icon — must show green "ON" badge
-- Refresh the page after activating
+**Commands not working?**
+- Click the extension icon — must show green "ON"
+- Run `npx web-agent status` to check configuration
 
-**Relay connection issues?**
-- Run `npx tab-agent status` to check config
-- Run `npx tab-agent start` to see error details
-
----
+**No active tabs?**
+- Activate at least one tab by clicking the extension icon
 
 ## How It Works
 
-1. **Chrome Extension** — Runs in your browser with access to activated tabs and your session cookies
+1. **Chrome Extension** — Injects into activated tabs, captures DOM snapshots
+2. **Relay Server** — Bridges AI ↔ Extension via Chrome Native Messaging (runs in background)
+3. **CLI** — Simple commands that any LLM can execute
 
-2. **Relay Server** — Local WebSocket server that bridges LLM ↔ Extension via Chrome's Native Messaging API (runs in background)
-
-3. **Skill File** — Tells Claude/Codex how to send commands
-
-**Data flow:**
 ```
-You: "Search Google for cats"
+You: "Find cheap flights to Tokyo"
  ↓
-LLM → CLI command → Relay Server → Native Messaging → Extension → Browser action
- ↑
-Results ← Response ← Relay Server ← Native Messaging ← Page snapshot
+LLM → npx web-agent navigate "google.com/flights"
+    → npx web-agent snapshot
+    → npx web-agent type e5 "Tokyo"
+    → npx web-agent click e12
+    → ...
 ```
-
----
 
 ## License
 
@@ -228,4 +163,4 @@ MIT
 
 ---
 
-**Works with [Claude Code](https://claude.ai/code), [Codex](https://openai.com/codex), and any LLM that can run shell commands.**
+**Keywords:** web agent, browser automation, AI browser control, Claude browser, Codex browser, LLM web automation, browser agent, ChatGPT browser
