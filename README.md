@@ -31,7 +31,7 @@ Tab Agent is different:
 |---|---|---|
 | **Your logins** | ✅ Uses existing sessions | ❌ Must re-authenticate |
 | **Security** | ✅ Click to activate specific tabs | ❌ Full browser access |
-| **Privacy** | ✅ Banking/email stays isolated | ❌ Agent sees everything |
+| **Privacy** | ✅ Credentials never leave your browser | ❌ Agent sees everything |
 | **Setup** | ✅ Uses your Chrome | ❌ Downloads separate browser |
 | **Visibility** | ✅ Watch in real browser | ❌ Runs hidden/headless |
 
