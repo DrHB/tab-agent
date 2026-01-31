@@ -1,9 +1,10 @@
 # Tab Agent
 
 [![npm version](https://img.shields.io/npm/v/tab-agent.svg)](https://www.npmjs.com/package/tab-agent)
+[![Chrome](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white)](https://github.com/DrHB/tab-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Browser control for Claude Code and Codex** — click-to-activate security.
+**Browser control for Claude Code and Codex** — Chrome & Chromium-based browsers.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
