@@ -1,6 +1,6 @@
 {
   "name": "tab-agent",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Browser control for Claude Code and Codex via WebSocket",
   "bin": {
     "tab-agent": "./bin/tab-agent.js"
