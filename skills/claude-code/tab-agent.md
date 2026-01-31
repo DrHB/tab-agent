@@ -10,7 +10,7 @@ WebSocket `ws://localhost:9876`. User activates tabs via extension icon (green =
 ## Before First Command
 
 ```bash
-curl -s http://localhost:9876/health || (cd ~/tab-agent && node bin/tab-agent.js start &)
+curl -s http://localhost:9876/health || (npx tab-agent start &)
 sleep 2
 ```
 
