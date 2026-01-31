@@ -1,10 +1,10 @@
 {
-  "name": "ai-web-agent",
+  "name": "browseragent",
   "version": "0.1.0",
-  "description": "Give LLMs full control of your browser - secure, click-to-activate browser automation for Claude, Codex, and any AI",
+  "description": "Give LLMs full control of your browser - secure, click-to-activate automation for Claude, ChatGPT, Codex, and any AI",
   "bin": {
-    "ai-web-agent": "./bin/tab-agent.js",
-    "web-agent": "./bin/tab-agent.js",
+    "browseragent": "./bin/tab-agent.js",
+    "browser-agent": "./bin/tab-agent.js",
     "tab-agent": "./bin/tab-agent.js"
   },
   "main": "relay/server.js",
@@ -22,27 +22,28 @@
     "ws": "^8.16.0"
   },
   "keywords": [
-    "web-agent",
+    "browseragent",
+    "browser-agent",
     "browser-automation",
     "browser-control",
     "ai-browser",
     "llm-browser",
     "claude",
+    "chatgpt",
     "codex",
     "openai",
     "anthropic",
     "chrome-extension",
-    "browser-agent",
     "web-automation",
     "ai-agent",
-    "mcp",
     "puppeteer-alternative",
-    "playwright-alternative"
+    "playwright-alternative",
+    "web-agent"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/AiGithubWebAgent/web-agent"
+    "url": "https://github.com/AiBrowserAgent/browseragent"
   },
-  "homepage": "https://github.com/AiGithubWebAgent/web-agent#readme",
+  "homepage": "https://github.com/AiBrowserAgent/browseragent#readme",
   "license": "MIT"
 }

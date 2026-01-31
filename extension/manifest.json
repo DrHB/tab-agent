@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Web Agent",
+  "name": "BrowserAgent",
   "version": "0.1.0",
   "description": "Browser control for Claude Code and Codex via WebSocket",
   "permissions": [
@@ -19,7 +19,7 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Web Agent - Click to toggle",
+    "default_title": "BrowserAgent - Click to toggle",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

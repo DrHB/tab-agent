@@ -30,7 +30,7 @@ if (BROWSER_COMMANDS.includes(command)) {
 
 function showHelp() {
   console.log(`
-web-agent - Give LLMs full control of your browser
+browseragent - Give LLMs full control of your browser
 
 Setup:
   setup    Auto-detect extension, configure native messaging
@@ -52,11 +52,11 @@ Browser Control:
 Workflow: snapshot → click/type → snapshot → repeat
 
 Examples:
-  npx ai-web-agent setup
-  npx ai-web-agent snapshot
-  npx ai-web-agent click e5
-  npx ai-web-agent type e3 "hello world"
-  npx ai-web-agent navigate "https://google.com"
+  npx browseragent setup
+  npx browseragent snapshot
+  npx browseragent click e5
+  npx browseragent type e3 "hello world"
+  npx browseragent navigate "https://google.com"
 
 Version: ${require('../package.json').version}
 `);

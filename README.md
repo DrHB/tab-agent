@@ -1,16 +1,16 @@
-# AI Web Agent
+# BrowserAgent
 
-[![npm version](https://img.shields.io/npm/v/ai-web-agent.svg)](https://www.npmjs.com/package/ai-web-agent)
+[![npm version](https://img.shields.io/npm/v/browseragent.svg)](https://www.npmjs.com/package/browseragent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Give LLMs full control of your browser** — securely, with click-to-activate permission.
 
-Works with Claude Code, Codex, ChatGPT, and any AI that can run shell commands.
+Works with Claude, ChatGPT, Codex, and any AI that can run shell commands.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Claude Code   │────▶│  Relay Server   │────▶│    Extension    │
-│  Codex / GPT    │◀────│   (background)  │◀────│    (Chrome)     │
+│  Claude / GPT   │────▶│  Relay Server   │────▶│    Extension    │
+│   Codex / LLM   │◀────│   (background)  │◀────│    (Chrome)     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                        │
                                                        ▼
@@ -20,27 +20,27 @@ Works with Claude Code, Codex, ChatGPT, and any AI that can run shell commands.
                                              └───────────────────┘
 ```
 
-## Why Web Agent?
+## Features
 
 - **Full browser control** — navigate, click, type, scroll, screenshot, run JavaScript
-- **Uses your login sessions** — access GitHub, Gmail, X, Amazon without sharing credentials
+- **Uses your login sessions** — access GitHub, Gmail, Amazon without sharing credentials
 - **Runs in background** — relay starts automatically, works while you do other things
 - **Click-to-activate security** — only tabs you explicitly enable, others stay private
 - **AI-optimized snapshots** — pages converted to text with refs `[e1]`, `[e2]` for easy targeting
-- **Works with any LLM** — Claude, GPT, Codex, or custom agents
+- **Works with any LLM** — Claude, ChatGPT, Codex, or custom AI agents
 
 ## Quick Start
 
 ```bash
 # 1. Install extension
-git clone https://github.com/AiGithubWebAgent/web-agent
+git clone https://github.com/AiBrowserAgent/browseragent
 # Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
 
 # 2. Setup
-npx ai-web-agent setup
+npx browseragent setup
 
 # 3. Activate & go
-# Click the extension icon on any tab (turns green)
+# Click extension icon on any tab (turns green)
 # Ask your AI: "Search Amazon for mechanical keyboards and find the best rated"
 ```
 
@@ -60,27 +60,27 @@ npx ai-web-agent setup
 "Get the titles and prices of the first 10 products on this page"
 
 # Automation
-"Fill out this form with my details and submit"
+"Fill out this form with my details"
 ```
 
 ## Commands
 
 ```bash
 # Core workflow
-npx ai-web-agent snapshot                # Get page content with refs [e1], [e2]...
-npx ai-web-agent click <ref>             # Click element (e.g., click e5)
-npx ai-web-agent type <ref> <text>       # Type into element
-npx ai-web-agent fill <ref> <value>      # Fill form field
+npx browseragent snapshot                # Get page content with refs [e1], [e2]...
+npx browseragent click <ref>             # Click element (e.g., click e5)
+npx browseragent type <ref> <text>       # Type into element
+npx browseragent fill <ref> <value>      # Fill form field
 
 # Navigation
-npx ai-web-agent navigate <url>          # Go to URL
-npx ai-web-agent scroll <dir> [amount]   # Scroll up/down
-npx ai-web-agent press <key>             # Press key (Enter, Escape, Tab)
+npx browseragent navigate <url>          # Go to URL
+npx browseragent scroll <dir> [amount]   # Scroll up/down
+npx browseragent press <key>             # Press key (Enter, Escape, Tab)
 
 # Utilities
-npx ai-web-agent tabs                    # List active tabs
-npx ai-web-agent wait <text>             # Wait for text to appear
-npx ai-web-agent screenshot              # Capture page (fallback for complex UIs)
+npx browseragent tabs                    # List active tabs
+npx browseragent wait <text>             # Wait for text to appear
+npx browseragent screenshot              # Capture page (fallback for complex UIs)
 ```
 
 **Workflow:** `snapshot` → use refs → `click`/`type` → `snapshot` again → repeat
@@ -90,7 +90,7 @@ npx ai-web-agent screenshot              # Capture page (fallback for complex UI
 ### 1. Load Extension
 
 ```bash
-git clone https://github.com/AiGithubWebAgent/web-agent
+git clone https://github.com/AiBrowserAgent/browseragent
 ```
 
 1. Open `chrome://extensions`
@@ -101,19 +101,19 @@ git clone https://github.com/AiGithubWebAgent/web-agent
 ### 2. Run Setup
 
 ```bash
-npx ai-web-agent setup
+npx browseragent setup
 ```
 
 This auto-detects your extension and configures everything.
 
 ### 3. Activate Tabs
 
-Click the Web Agent icon on any tab you want to control. Green = active.
+Click the BrowserAgent icon on any tab you want to control. Green = active.
 
 ## Security Model
 
-| Feature | Web Agent | Traditional Automation |
-|---------|-----------|----------------------|
+| Feature | BrowserAgent | Traditional Automation |
+|---------|--------------|----------------------|
 | **Access** | Only tabs you click to activate | Entire browser |
 | **Sessions** | Uses your cookies | Requires credentials |
 | **Visibility** | Green badge shows active tabs | Hidden/background |
@@ -136,7 +136,7 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 
 **Commands not working?**
 - Click the extension icon — must show green "ON"
-- Run `npx ai-web-agent status` to check configuration
+- Run `npx browseragent status` to check configuration
 
 **No active tabs?**
 - Activate at least one tab by clicking the extension icon
@@ -150,10 +150,10 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 ```
 You: "Find cheap flights to Tokyo"
  ↓
-LLM → npx ai-web-agent navigate "google.com/flights"
-    → npx ai-web-agent snapshot
-    → npx ai-web-agent type e5 "Tokyo"
-    → npx ai-web-agent click e12
+LLM → npx browseragent navigate "google.com/flights"
+    → npx browseragent snapshot
+    → npx browseragent type e5 "Tokyo"
+    → npx browseragent click e12
     → ...
 ```
 
@@ -163,4 +163,4 @@ MIT
 
 ---
 
-**Keywords:** web agent, browser automation, AI browser control, Claude browser, Codex browser, LLM web automation, browser agent, ChatGPT browser
+**Keywords:** browser agent, browser automation, AI browser control, Claude browser, ChatGPT browser, LLM web automation, Codex browser, puppeteer alternative, playwright alternative

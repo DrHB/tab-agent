@@ -20,7 +20,7 @@ async function runCommand(args) {
   const ws = new WebSocket('ws://localhost:9876');
 
   const timeout = setTimeout(() => {
-    console.error('Connection timeout - is the relay running? Try: npx ai-web-agent start');
+    console.error('Connection timeout - is the relay running? Try: npx browseragent start');
     ws.close();
     process.exit(1);
   }, 5000);
@@ -28,7 +28,7 @@ async function runCommand(args) {
   ws.on('error', (err) => {
     clearTimeout(timeout);
     console.error('Connection failed:', err.message);
-    console.error('Make sure relay is running: npx ai-web-agent start');
+    console.error('Make sure relay is running: npx browseragent start');
     process.exit(1);
   });
 
@@ -50,7 +50,7 @@ async function runCommand(args) {
     // Handle tabs response
     if (msg.id === 0) {
       if (!msg.tabs || msg.tabs.length === 0) {
-        console.error('No active tabs. Click Tab Agent icon on a tab to activate it.');
+        console.error('No active tabs. Click BrowserAgent icon on a tab to activate it.');
         ws.close();
         process.exit(1);
       }
@@ -130,9 +130,9 @@ function buildPayload(command, params, tabId) {
 
 function printHelp() {
   console.log(`
-web-agent - Give LLMs full control of your browser
+browseragent - Give LLMs full control of your browser
 
-Usage: npx ai-web-agent <command> [options]
+Usage: npx browseragent <command> [options]
 
 Commands:
   snapshot                  Get page content with refs [e1], [e2]...
@@ -150,10 +150,10 @@ Commands:
 Workflow: snapshot → click/type → snapshot → repeat
 
 Examples:
-  npx ai-web-agent snapshot
-  npx ai-web-agent click e5
-  npx ai-web-agent type e3 "hello world"
-  npx ai-web-agent navigate "https://google.com"
+  npx browseragent snapshot
+  npx browseragent click e5
+  npx browseragent type e3 "hello world"
+  npx browseragent navigate "https://google.com"
 `);
 }
 

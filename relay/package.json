@@ -1,7 +1,7 @@
 {
-  "name": "web-agent-relay",
+  "name": "browseragent-relay",
   "version": "0.1.0",
-  "description": "WebSocket relay for Web Agent Chrome extension",
+  "description": "WebSocket relay for BrowserAgent Chrome extension",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
