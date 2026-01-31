@@ -30,7 +30,7 @@ if (BROWSER_COMMANDS.includes(command)) {
 
 function showHelp() {
   console.log(`
-browseragent - Give LLMs full control of your browser
+tabpilot - Give LLMs full control of your browser
 
 Setup:
   setup    Auto-detect extension, configure native messaging
@@ -52,11 +52,11 @@ Browser Control:
 Workflow: snapshot → click/type → snapshot → repeat
 
 Examples:
-  npx browseragent setup
-  npx browseragent snapshot
-  npx browseragent click e5
-  npx browseragent type e3 "hello world"
-  npx browseragent navigate "https://google.com"
+  npx tabpilot setup
+  npx tabpilot snapshot
+  npx tabpilot click e5
+  npx tabpilot type e3 "hello world"
+  npx tabpilot navigate "https://google.com"
 
 Version: ${require('../package.json').version}
 `);

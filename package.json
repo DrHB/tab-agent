@@ -1,9 +1,9 @@
 {
-  "name": "browseragent",
+  "name": "tabpilot",
   "version": "0.1.0",
   "description": "Give LLMs full control of your browser - secure, click-to-activate automation for Claude, ChatGPT, Codex, and any AI",
   "bin": {
-    "browseragent": "./bin/tab-agent.js",
+    "tabpilot": "./bin/tab-agent.js",
     "browser-agent": "./bin/tab-agent.js",
     "tab-agent": "./bin/tab-agent.js"
   },
@@ -22,7 +22,7 @@
     "ws": "^8.16.0"
   },
   "keywords": [
-    "browseragent",
+    "tabpilot",
     "browser-agent",
     "browser-automation",
     "browser-control",
@@ -42,8 +42,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/AiBrowserAgent/browseragent"
+    "url": "https://github.com/AiTabPilot/tabpilot"
   },
-  "homepage": "https://github.com/AiBrowserAgent/browseragent#readme",
+  "homepage": "https://github.com/AiTabPilot/tabpilot#readme",
   "license": "MIT"
 }

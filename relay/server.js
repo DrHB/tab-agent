@@ -102,7 +102,7 @@ wss.on('connection', (ws, req) => {
 });
 
 httpServer.listen(PORT, () => {
-  console.log(`BrowserAgent Relay running on ws://localhost:${PORT}`);
+  console.log(`TabPilot Relay running on ws://localhost:${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
 });
 

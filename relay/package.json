@@ -1,7 +1,7 @@
 {
-  "name": "browseragent-relay",
+  "name": "tabpilot-relay",
   "version": "0.1.0",
-  "description": "WebSocket relay for BrowserAgent Chrome extension",
+  "description": "WebSocket relay for TabPilot Chrome extension",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

@@ -1,6 +1,6 @@
-# BrowserAgent
+# TabPilot
 
-[![npm version](https://img.shields.io/npm/v/browseragent.svg)](https://www.npmjs.com/package/browseragent)
+[![npm version](https://img.shields.io/npm/v/tabpilot.svg)](https://www.npmjs.com/package/tabpilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Give LLMs full control of your browser** — securely, with click-to-activate permission.
@@ -33,11 +33,11 @@ Works with Claude, ChatGPT, Codex, and any AI that can run shell commands.
 
 ```bash
 # 1. Install extension
-git clone https://github.com/AiBrowserAgent/browseragent
+git clone https://github.com/AiTabPilot/tabpilot
 # Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
 
 # 2. Setup
-npx browseragent setup
+npx tabpilot setup
 
 # 3. Activate & go
 # Click extension icon on any tab (turns green)
@@ -67,20 +67,20 @@ npx browseragent setup
 
 ```bash
 # Core workflow
-npx browseragent snapshot                # Get page content with refs [e1], [e2]...
-npx browseragent click <ref>             # Click element (e.g., click e5)
-npx browseragent type <ref> <text>       # Type into element
-npx browseragent fill <ref> <value>      # Fill form field
+npx tabpilot snapshot                # Get page content with refs [e1], [e2]...
+npx tabpilot click <ref>             # Click element (e.g., click e5)
+npx tabpilot type <ref> <text>       # Type into element
+npx tabpilot fill <ref> <value>      # Fill form field
 
 # Navigation
-npx browseragent navigate <url>          # Go to URL
-npx browseragent scroll <dir> [amount]   # Scroll up/down
-npx browseragent press <key>             # Press key (Enter, Escape, Tab)
+npx tabpilot navigate <url>          # Go to URL
+npx tabpilot scroll <dir> [amount]   # Scroll up/down
+npx tabpilot press <key>             # Press key (Enter, Escape, Tab)
 
 # Utilities
-npx browseragent tabs                    # List active tabs
-npx browseragent wait <text>             # Wait for text to appear
-npx browseragent screenshot              # Capture page (fallback for complex UIs)
+npx tabpilot tabs                    # List active tabs
+npx tabpilot wait <text>             # Wait for text to appear
+npx tabpilot screenshot              # Capture page (fallback for complex UIs)
 ```
 
 **Workflow:** `snapshot` → use refs → `click`/`type` → `snapshot` again → repeat
@@ -90,7 +90,7 @@ npx browseragent screenshot              # Capture page (fallback for complex UI
 ### 1. Load Extension
 
 ```bash
-git clone https://github.com/AiBrowserAgent/browseragent
+git clone https://github.com/AiTabPilot/tabpilot
 ```
 
 1. Open `chrome://extensions`
@@ -101,18 +101,18 @@ git clone https://github.com/AiBrowserAgent/browseragent
 ### 2. Run Setup
 
 ```bash
-npx browseragent setup
+npx tabpilot setup
 ```
 
 This auto-detects your extension and configures everything.
 
 ### 3. Activate Tabs
 
-Click the BrowserAgent icon on any tab you want to control. Green = active.
+Click the TabPilot icon on any tab you want to control. Green = active.
 
 ## Security Model
 
-| Feature | BrowserAgent | Traditional Automation |
+| Feature | TabPilot | Traditional Automation |
 |---------|--------------|----------------------|
 | **Access** | Only tabs you click to activate | Entire browser |
 | **Sessions** | Uses your cookies | Requires credentials |
@@ -136,7 +136,7 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 
 **Commands not working?**
 - Click the extension icon — must show green "ON"
-- Run `npx browseragent status` to check configuration
+- Run `npx tabpilot status` to check configuration
 
 **No active tabs?**
 - Activate at least one tab by clicking the extension icon
@@ -150,10 +150,10 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 ```
 You: "Find cheap flights to Tokyo"
  ↓
-LLM → npx browseragent navigate "google.com/flights"
-    → npx browseragent snapshot
-    → npx browseragent type e5 "Tokyo"
-    → npx browseragent click e12
+LLM → npx tabpilot navigate "google.com/flights"
+    → npx tabpilot snapshot
+    → npx tabpilot type e5 "Tokyo"
+    → npx tabpilot click e12
     → ...
 ```
 

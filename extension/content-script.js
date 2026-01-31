@@ -2,7 +2,7 @@
 // Handles commands from service worker and executes DOM actions
 
 if (window.__tabAgent_contentScriptLoaded) {
-  console.log('BrowserAgent content script already loaded');
+  console.log('TabPilot content script already loaded');
 } else {
   window.__tabAgent_contentScriptLoaded = true;
 
@@ -506,5 +506,5 @@ if (window.__tabAgent_contentScriptLoaded) {
     return true;
   });
 
-  console.log('BrowserAgent content script loaded');
+  console.log('TabPilot content script loaded');
 }
