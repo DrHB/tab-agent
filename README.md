@@ -1,4 +1,4 @@
-# 🔗 Tab Agent
+# Tab Agent
 
 [![npm version](https://img.shields.io/npm/v/tab-agent.svg)](https://www.npmjs.com/package/tab-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
