@@ -4,7 +4,9 @@
 [![Chrome](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white)](https://github.com/DrHB/tab-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Browser control for Claude Code and Codex** — Chrome & Chromium-based browsers.
+**Let Claude browse as YOU** — uses your existing logins, click-to-activate security.
+
+> No headless browser. No re-authenticating. Claude uses your actual Chrome sessions.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -18,6 +20,24 @@
                                              │   🟢 Click to ON  │
                                              └───────────────────┘
 ```
+
+## Why Tab Agent?
+
+Most browser automation tools (Playwright, Puppeteer, agent-browser) spin up a **fresh headless browser** — you start logged out of everything.
+
+Tab Agent is different:
+
+| | Tab Agent | Headless Browsers |
+|---|---|---|
+| **Your logins** | ✅ Uses existing sessions | ❌ Must re-authenticate |
+| **Security** | ✅ Click to activate specific tabs | ❌ Full browser access |
+| **Privacy** | ✅ Banking/email stays isolated | ❌ Agent sees everything |
+| **Setup** | ✅ Uses your Chrome | ❌ Downloads separate browser |
+| **Visibility** | ✅ Watch in real browser | ❌ Runs hidden/headless |
+
+**Use Tab Agent when:** Claude needs to browse as "you" — shopping with your Prime account, checking your GitHub notifications, using sites you're already logged into.
+
+**Use headless browsers when:** CI/CD automation, web scraping, or testing with fresh sessions.
 
 ## Features
 
@@ -109,17 +129,6 @@ This auto-detects your extension and configures everything.
 
 Click the Tab Agent icon on any tab you want to control. Green = active.
 
-## Security Model
-
-| Feature | Tab Agent | Traditional Automation |
-|---------|--------------|----------------------|
-| **Access** | Only tabs you click to activate | Entire browser |
-| **Sessions** | Uses your cookies | Requires credentials |
-| **Visibility** | Green badge shows active tabs | Hidden/background |
-| **Control** | You choose what AI can access | Full access by default |
-
-Your banking, email, and sensitive tabs stay completely isolated unless you explicitly activate them.
-
 ## Supported Browsers
 
 - Google Chrome
@@ -162,4 +171,4 @@ MIT
 
 ---
 
-**Keywords:** browser automation, claude code, codex, AI browser control, web automation, puppeteer alternative, playwright alternative
+**Keywords:** browser automation, claude code, codex, AI browser control, web automation, agent-browser alternative, playwright alternative, use existing logins, click-to-activate security
