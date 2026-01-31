@@ -2,20 +2,31 @@
 
 [![npm version](https://img.shields.io/npm/v/tab-agent.svg)](https://www.npmjs.com/package/tab-agent)
 
-**Secure browser control for AI assistants** — only the tabs you explicitly activate, not your entire browser.
+**Give Claude, Codex, or any LLM full control of your browser tabs** — securely, with click-to-activate permission.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Claude/Codex   │────▶│  Relay Server   │────▶│    Extension    │
-│                 │◀────│   :9876         │◀────│    (Chrome)     │
+│   Claude Code   │────▶│  Relay Server   │────▶│    Extension    │
+│   Codex / LLM   │◀────│   (background)  │◀────│    (Chrome)     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
-                                                        │
-                                                        ▼
-                                              ┌───────────────────┐
-                                              │  Your Active Tab  │
-                                              │    🟢 ON          │
-                                              └───────────────────┘
+                                                       │
+                                                       ▼
+                                             ┌───────────────────┐
+                                             │  Your Active Tab  │
+                                             │   🟢 Click to ON  │
+                                             └───────────────────┘
 ```
+
+## Features
+
+- **Full browser control** — navigate, click, type, scroll, screenshot, run JavaScript
+- **Uses your login sessions** — access authenticated sites (GitHub, Gmail, X) without sharing credentials
+- **Runs in background** — relay server starts automatically, works while you do other things
+- **Click-to-activate security** — only tabs you explicitly enable, your other tabs stay private
+- **AI-optimized snapshots** — pages converted to readable text with element refs `[e1]`, `[e2]`
+- **Works with any LLM** — Claude Code, Codex, or any tool that can run shell commands
+
+---
 
 ## Quick Start
 
@@ -27,16 +38,10 @@ git clone https://github.com/DrHB/tab-agent
 # 2. Setup (auto-detects everything)
 npx tab-agent setup
 
-# 3. Activate a tab
+# 3. Activate a tab & go!
 # → Click Tab Agent icon on any tab (turns green = active)
-
-# 4. Control it!
-npx tab-agent snapshot                # See the page
-npx tab-agent click e5                # Click element [e5]
-npx tab-agent type e3 "hello world"   # Type into [e3]
+# → Ask Claude: "Use tab-agent to search Google for 'hello world'"
 ```
-
-Or just ask your AI: *"Use tab-agent to search Google for 'hello world'"*
 
 ---
 
@@ -50,9 +55,8 @@ Or just ask your AI: *"Use tab-agent to search Google for 'hello world'"*
 | **Visibility** | Green badge = active | Hidden/background |
 | **Sessions** | Uses your cookies | Requires re-login |
 | **Credentials** | Never shared | Often required |
-| **Audit** | Full action logging | Varies |
 
-**Click-to-activate model:** Your banking, email, and sensitive tabs stay completely isolated. You always see exactly which tabs AI can control.
+**Click-to-activate model:** Your banking, email, and sensitive tabs stay completely isolated. You always see exactly which tabs the LLM can control.
 
 ### 🍪 Works With Your Login Sessions
 
@@ -63,9 +67,9 @@ Because Tab Agent runs as a Chrome extension:
 - **Works with SSO and 2FA** — enterprise apps, protected accounts
 - **No credential sharing** — your passwords stay in your browser
 
-### 🤖 AI-Optimized
+### 🤖 LLM-Optimized
 
-- **Semantic snapshots** — pages converted to AI-readable text with refs `[e1]`, `[e2]`
+- **Semantic snapshots** — pages converted to readable text with refs `[e1]`, `[e2]`
 - **Screenshot fallback** — for complex dynamic pages
 - **Simple targeting** — click/type using refs instead of fragile CSS selectors
 
@@ -119,7 +123,7 @@ This automatically:
 
 1. Navigate to any webpage
 2. **Click the Tab Agent icon** — it turns green (🟢 ON)
-3. Ask your AI to interact with the page
+3. Ask your LLM to interact with the page
 
 ---
 
@@ -130,32 +134,28 @@ This automatically:
 |---------|-------------|
 | `tabs` | List all activated tabs |
 | `navigate` | Go to a URL |
-| `snapshot` | Get AI-readable page with element refs |
+| `snapshot` | Get page with element refs |
 | `screenshot` | Capture viewport image |
-| `screenshot fullPage` | Capture entire page |
+| `screenshot --full` | Capture entire page |
 
 ### Interaction
 | Command | Description |
 |---------|-------------|
 | `click` | Click element by ref |
 | `type` | Type text into element |
-| `type ... submit` | Type and press Enter |
 | `fill` | Fill a form field |
-| `batchfill` | Fill multiple fields at once |
 | `press` | Press a key (Enter, Escape, Tab, Arrows) |
 
 ### Page Control
 | Command | Description |
 |---------|-------------|
 | `scroll` | Scroll up/down by amount |
-| `scrollintoview` | Scroll element into view |
 | `wait` | Wait for text or element to appear |
 | `evaluate` | Run JavaScript in page context |
-| `dialog` | Handle alert/confirm/prompt |
+
+---
 
 ## CLI Usage
-
-Run commands directly from your terminal:
 
 ```bash
 # Setup & Status
@@ -165,24 +165,13 @@ npx tab-agent start                   # Start relay server manually
 
 # Browser Commands
 npx tab-agent tabs                    # List active tabs
-npx tab-agent snapshot                # Get page content with refs [e1], [e2]...
+npx tab-agent snapshot                # Get page content with refs
 npx tab-agent screenshot              # Capture viewport
 npx tab-agent screenshot --full       # Capture full page
-
-# Interactions (use refs from snapshot)
 npx tab-agent click e5                # Click element
 npx tab-agent type e3 "hello"         # Type text
-npx tab-agent fill e3 "value"         # Fill field
-npx tab-agent press Enter             # Press key (Enter, Escape, Tab, etc.)
-
-# Navigation
 npx tab-agent navigate "https://..."  # Go to URL
-npx tab-agent scroll down 500         # Scroll page
-npx tab-agent wait "Loading"          # Wait for text to appear
-npx tab-agent evaluate "document.title"  # Run JavaScript
 ```
-
-**Workflow:** `snapshot` → read refs → `click`/`type`/`fill` → repeat
 
 ---
 
@@ -218,17 +207,17 @@ Setup automatically detects your browser.
 
 1. **Chrome Extension** — Runs in your browser with access to activated tabs and your session cookies
 
-2. **Relay Server** — Local WebSocket server (port 9876) that bridges AI ↔ Extension via Chrome's Native Messaging API
+2. **Relay Server** — Local WebSocket server that bridges LLM ↔ Extension via Chrome's Native Messaging API (runs in background)
 
-3. **Skill File** — Tells Claude/Codex how to send commands to the relay
+3. **Skill File** — Tells Claude/Codex how to send commands
 
 **Data flow:**
 ```
 You: "Search Google for cats"
  ↓
-Claude/Codex → WebSocket command → Relay Server → Native Messaging → Extension → DOM action
+LLM → CLI command → Relay Server → Native Messaging → Extension → Browser action
  ↑
-Results ← WebSocket response ← Relay Server ← Native Messaging ← Page snapshot
+Results ← Response ← Relay Server ← Native Messaging ← Page snapshot
 ```
 
 ---
@@ -239,4 +228,4 @@ MIT
 
 ---
 
-**Works with any AI that can run shell commands** — [Claude Code](https://claude.ai/code), [Codex](https://openai.com/codex), or your own scripts.
+**Works with [Claude Code](https://claude.ai/code), [Codex](https://openai.com/codex), and any LLM that can run shell commands.**
