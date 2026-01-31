@@ -1,6 +1,6 @@
-# TabPilot
+# Tab Agent
 
-[![npm version](https://img.shields.io/npm/v/tabpilot.svg)](https://www.npmjs.com/package/tabpilot)
+[![npm version](https://img.shields.io/npm/v/tab-agent.svg)](https://www.npmjs.com/package/tab-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Give LLMs full control of your browser** — securely, with click-to-activate permission.
@@ -33,11 +33,11 @@ Works with Claude, ChatGPT, Codex, and any AI that can run shell commands.
 
 ```bash
 # 1. Install extension
-git clone https://github.com/DrHB/tab-pilot
+git clone https://github.com/DrHB/tab-agent
 # Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
 
 # 2. Setup
-npx tabpilot setup
+npx tab-agent setup
 
 # 3. Activate & go
 # Click extension icon on any tab (turns green)
@@ -67,20 +67,20 @@ npx tabpilot setup
 
 ```bash
 # Core workflow
-npx tabpilot snapshot                # Get page content with refs [e1], [e2]...
-npx tabpilot click <ref>             # Click element (e.g., click e5)
-npx tabpilot type <ref> <text>       # Type into element
-npx tabpilot fill <ref> <value>      # Fill form field
+npx tab-agent snapshot                # Get page content with refs [e1], [e2]...
+npx tab-agent click <ref>             # Click element (e.g., click e5)
+npx tab-agent type <ref> <text>       # Type into element
+npx tab-agent fill <ref> <value>      # Fill form field
 
 # Navigation
-npx tabpilot navigate <url>          # Go to URL
-npx tabpilot scroll <dir> [amount]   # Scroll up/down
-npx tabpilot press <key>             # Press key (Enter, Escape, Tab)
+npx tab-agent navigate <url>          # Go to URL
+npx tab-agent scroll <dir> [amount]   # Scroll up/down
+npx tab-agent press <key>             # Press key (Enter, Escape, Tab)
 
 # Utilities
-npx tabpilot tabs                    # List active tabs
-npx tabpilot wait <text>             # Wait for text to appear
-npx tabpilot screenshot              # Capture page (fallback for complex UIs)
+npx tab-agent tabs                    # List active tabs
+npx tab-agent wait <text>             # Wait for text to appear
+npx tab-agent screenshot              # Capture page (fallback for complex UIs)
 ```
 
 **Workflow:** `snapshot` → use refs → `click`/`type` → `snapshot` again → repeat
@@ -90,7 +90,7 @@ npx tabpilot screenshot              # Capture page (fallback for complex UIs)
 ### 1. Load Extension
 
 ```bash
-git clone https://github.com/DrHB/tab-pilot
+git clone https://github.com/DrHB/tab-agent
 ```
 
 1. Open `chrome://extensions`
@@ -101,18 +101,18 @@ git clone https://github.com/DrHB/tab-pilot
 ### 2. Run Setup
 
 ```bash
-npx tabpilot setup
+npx tab-agent setup
 ```
 
 This auto-detects your extension and configures everything.
 
 ### 3. Activate Tabs
 
-Click the TabPilot icon on any tab you want to control. Green = active.
+Click the Tab Agent icon on any tab you want to control. Green = active.
 
 ## Security Model
 
-| Feature | TabPilot | Traditional Automation |
+| Feature | Tab Agent | Traditional Automation |
 |---------|--------------|----------------------|
 | **Access** | Only tabs you click to activate | Entire browser |
 | **Sessions** | Uses your cookies | Requires credentials |
@@ -136,7 +136,7 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 
 **Commands not working?**
 - Click the extension icon — must show green "ON"
-- Run `npx tabpilot status` to check configuration
+- Run `npx tab-agent status` to check configuration
 
 **No active tabs?**
 - Activate at least one tab by clicking the extension icon
@@ -150,10 +150,10 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 ```
 You: "Find cheap flights to Tokyo"
  ↓
-LLM → npx tabpilot navigate "google.com/flights"
-    → npx tabpilot snapshot
-    → npx tabpilot type e5 "Tokyo"
-    → npx tabpilot click e12
+LLM → npx tab-agent navigate "google.com/flights"
+    → npx tab-agent snapshot
+    → npx tab-agent type e5 "Tokyo"
+    → npx tab-agent click e12
     → ...
 ```
 
