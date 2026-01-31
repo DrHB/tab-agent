@@ -1,6 +1,6 @@
 {
   "name": "tab-agent",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Give LLMs full control of your browser - secure, click-to-activate automation for Claude, ChatGPT, Codex, and any AI",
   "bin": {
     "tab-agent": "./bin/tab-agent.js"
