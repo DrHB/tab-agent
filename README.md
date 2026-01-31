@@ -3,14 +3,12 @@
 [![npm version](https://img.shields.io/npm/v/tab-agent.svg)](https://www.npmjs.com/package/tab-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Give LLMs full control of your browser** — securely, with click-to-activate permission.
-
-Works with Claude, ChatGPT, Codex, and any AI that can run shell commands.
+**Browser control for Claude Code and Codex** — click-to-activate security.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Claude / GPT   │────▶│  Relay Server   │────▶│    Extension    │
-│   Codex / LLM   │◀────│   (background)  │◀────│    (Chrome)     │
+│  Claude Code    │────▶│  Relay Server   │────▶│    Extension    │
+│    or Codex     │◀────│   (background)  │◀────│    (Chrome)     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                        │
                                                        ▼
@@ -27,7 +25,7 @@ Works with Claude, ChatGPT, Codex, and any AI that can run shell commands.
 - **Runs in background** — relay starts automatically, works while you do other things
 - **Click-to-activate security** — only tabs you explicitly enable, others stay private
 - **AI-optimized snapshots** — pages converted to text with refs `[e1]`, `[e2]` for easy targeting
-- **Works with any LLM** — Claude, ChatGPT, Codex, or custom AI agents
+- **Works with Claude Code & Codex** — installs skills automatically
 
 ## Quick Start
 
@@ -41,7 +39,7 @@ npx tab-agent setup
 
 # 3. Activate & go
 # Click extension icon on any tab (turns green)
-# Ask your AI: "Search Amazon for mechanical keyboards and find the best rated"
+# Ask Claude: "Search Amazon for mechanical keyboards and find the best rated"
 ```
 
 ## Example Tasks
@@ -145,12 +143,12 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 
 1. **Chrome Extension** — Injects into activated tabs, captures DOM snapshots
 2. **Relay Server** — Bridges AI ↔ Extension via Chrome Native Messaging (runs in background)
-3. **CLI** — Simple commands that any LLM can execute
+3. **CLI** — Simple commands for Claude Code and Codex
 
 ```
 You: "Find cheap flights to Tokyo"
  ↓
-LLM → npx tab-agent navigate "google.com/flights"
+Claude → npx tab-agent navigate "google.com/flights"
     → npx tab-agent snapshot
     → npx tab-agent type e5 "Tokyo"
     → npx tab-agent click e12
@@ -163,4 +161,4 @@ MIT
 
 ---
 
-**Keywords:** browser agent, browser automation, AI browser control, Claude browser, ChatGPT browser, LLM web automation, Codex browser, puppeteer alternative, playwright alternative
+**Keywords:** browser automation, claude code, codex, AI browser control, web automation, puppeteer alternative, playwright alternative
