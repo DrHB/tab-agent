@@ -145,6 +145,25 @@ This automatically:
 | `evaluate` | Run JavaScript in page context |
 | `dialog` | Handle alert/confirm/prompt |
 
+## CLI Usage
+
+Run commands directly from terminal:
+
+```bash
+npx tab-agent tabs                    # List active tabs
+npx tab-agent snapshot                # Get page content
+npx tab-agent screenshot              # Capture viewport
+npx tab-agent screenshot --full       # Capture full page
+npx tab-agent click e5                # Click element
+npx tab-agent type e3 "hello"         # Type text
+npx tab-agent fill e3 "value"         # Fill field
+npx tab-agent press Enter             # Press key
+npx tab-agent scroll down 500         # Scroll
+npx tab-agent navigate "https://..."  # Go to URL
+npx tab-agent wait "Loading"          # Wait for text
+npx tab-agent evaluate "document.title"  # Run JS
+```
+
 ---
 
 ## CLI Reference
