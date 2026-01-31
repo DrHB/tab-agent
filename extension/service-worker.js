@@ -192,6 +192,7 @@ async function routeCommand(tabId, command) {
       if (fullPage) {
         try {
           await chrome.debugger.attach({ tabId }, '1.3');
+          await chrome.debugger.sendCommand({ tabId }, 'Page.enable');
 
           const layout = await chrome.debugger.sendCommand(
             { tabId },
