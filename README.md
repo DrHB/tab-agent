@@ -1,6 +1,8 @@
 # Tab Agent
 
-**Secure browser control for Claude Code and Codex** — only the tabs you explicitly activate, not your entire browser.
+[![npm version](https://img.shields.io/npm/v/tab-agent.svg)](https://www.npmjs.com/package/tab-agent)
+
+**Secure browser control for AI assistants** — only the tabs you explicitly activate, not your entire browser.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -20,15 +22,21 @@
 ```bash
 # 1. Clone and load extension
 git clone https://github.com/DrHB/tab-agent
-# → Open chrome://extensions → Enable Developer mode → Load unpacked → select extension/
+# → Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
 
 # 2. Setup (auto-detects everything)
 npx tab-agent setup
 
-# 3. Use it
-# → Click Tab Agent icon on a tab (turns green)
-# → Ask Claude: "Use tab-agent to search Google for 'hello world'"
+# 3. Activate a tab
+# → Click Tab Agent icon on any tab (turns green = active)
+
+# 4. Control it!
+npx tab-agent snapshot                # See the page
+npx tab-agent click e5                # Click element [e5]
+npx tab-agent type e3 "hello world"   # Type into [e3]
 ```
+
+Or just ask your AI: *"Use tab-agent to search Google for 'hello world'"*
 
 ---
 
@@ -147,32 +155,34 @@ This automatically:
 
 ## CLI Usage
 
-Run commands directly from terminal:
+Run commands directly from your terminal:
 
 ```bash
+# Setup & Status
+npx tab-agent setup                   # Initial configuration
+npx tab-agent status                  # Check if everything works
+npx tab-agent start                   # Start relay server manually
+
+# Browser Commands
 npx tab-agent tabs                    # List active tabs
-npx tab-agent snapshot                # Get page content
+npx tab-agent snapshot                # Get page content with refs [e1], [e2]...
 npx tab-agent screenshot              # Capture viewport
 npx tab-agent screenshot --full       # Capture full page
+
+# Interactions (use refs from snapshot)
 npx tab-agent click e5                # Click element
 npx tab-agent type e3 "hello"         # Type text
 npx tab-agent fill e3 "value"         # Fill field
-npx tab-agent press Enter             # Press key
-npx tab-agent scroll down 500         # Scroll
+npx tab-agent press Enter             # Press key (Enter, Escape, Tab, etc.)
+
+# Navigation
 npx tab-agent navigate "https://..."  # Go to URL
-npx tab-agent wait "Loading"          # Wait for text
-npx tab-agent evaluate "document.title"  # Run JS
+npx tab-agent scroll down 500         # Scroll page
+npx tab-agent wait "Loading"          # Wait for text to appear
+npx tab-agent evaluate "document.title"  # Run JavaScript
 ```
 
----
-
-## CLI Reference
-
-```bash
-npx tab-agent setup   # Initial configuration
-npx tab-agent status  # Check if everything works
-npx tab-agent start   # Start relay server manually
-```
+**Workflow:** `snapshot` → read refs → `click`/`type`/`fill` → repeat
 
 ---
 
@@ -229,4 +239,4 @@ MIT
 
 ---
 
-**Made for [Claude Code](https://claude.ai/code) and [Codex](https://openai.com/codex)**
+**Works with any AI that can run shell commands** — [Claude Code](https://claude.ai/code), [Codex](https://openai.com/codex), or your own scripts.
