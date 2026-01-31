@@ -1,135 +1,161 @@
 # Tab Agent
 
-Secure tab-level browser control for Claude Code and Codex — only the tabs you explicitly activate, not your entire browser.
+**Secure browser control for Claude Code and Codex** — only the tabs you explicitly activate, not your entire browser.
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Claude/Codex   │────▶│  Relay Server   │────▶│    Extension    │
+│                 │◀────│   :9876         │◀────│    (Chrome)     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                                                        │
+                                                        ▼
+                                              ┌───────────────────┐
+                                              │  Your Active Tab  │
+                                              │    🟢 ON          │
+                                              └───────────────────┘
+```
+
+## Quick Start
+
+```bash
+# 1. Clone and load extension
+git clone https://github.com/DrHB/tab-agent
+# → Open chrome://extensions → Enable Developer mode → Load unpacked → select extension/
+
+# 2. Setup (auto-detects everything)
+npx tab-agent setup
+
+# 3. Use it
+# → Click Tab Agent icon on a tab (turns green)
+# → Ask Claude: "Use tab-agent to search Google for 'hello world'"
+```
+
+---
 
 ## Why Tab Agent?
 
-### Security First
-Unlike browser automation tools that control your entire browser, Tab Agent uses a **click-to-activate** model:
-- Only tabs you explicitly activate (green badge) can be controlled
-- Your banking, email, and other sensitive tabs remain completely isolated
-- No background access — you see exactly which tabs AI can interact with
-- Full audit logging of every action taken
+### 🔒 Security First
 
-### Works With Your Session
-Tab Agent operates through a Chrome extension, which means:
-- **Uses your existing cookies and login sessions** — no need to re-authenticate
-- Access sites that require login (GitHub, Twitter, internal tools, etc.)
-- Works with SSO, 2FA-protected accounts, and enterprise apps
-- No credential sharing or token management needed
+| | Tab Agent | Traditional Automation |
+|--|-----------|----------------------|
+| **Access** | Only tabs you activate | Entire browser |
+| **Visibility** | Green badge = active | Hidden/background |
+| **Sessions** | Uses your cookies | Requires re-login |
+| **Credentials** | Never shared | Often required |
+| **Audit** | Full action logging | Varies |
 
-### AI-Optimized
-- **Semantic snapshots** — pages converted to AI-readable text with element refs `[e1]`, `[e2]`
-- **Screenshot fallback** — for complex/dynamic pages, get visual screenshots
-- **Smart element targeting** — click, type, fill using simple refs instead of fragile selectors
+**Click-to-activate model:** Your banking, email, and sensitive tabs stay completely isolated. You always see exactly which tabs AI can control.
 
-## Install
+### 🍪 Works With Your Login Sessions
 
-### 1. Load Extension
+Because Tab Agent runs as a Chrome extension:
+
+- **Uses your existing cookies** — no re-authentication needed
+- **Access any site you're logged into** — GitHub, Twitter, Gmail, internal tools
+- **Works with SSO and 2FA** — enterprise apps, protected accounts
+- **No credential sharing** — your passwords stay in your browser
+
+### 🤖 AI-Optimized
+
+- **Semantic snapshots** — pages converted to AI-readable text with refs `[e1]`, `[e2]`
+- **Screenshot fallback** — for complex dynamic pages
+- **Simple targeting** — click/type using refs instead of fragile CSS selectors
+
+---
+
+## Example Use Cases
+
+**Web Research**
+> "Go to Hacker News and summarize the top 5 articles"
+
+**Authenticated Actions** (uses your session!)
+> "Check my GitHub notifications and list the unread ones"
+
+**Form Automation**
+> "Fill out this contact form with my details"
+
+**Data Extraction**
+> "Get the last 20 tweets from my timeline with author names"
+
+**Multi-step Workflows**
+> "Search Amazon for 'mechanical keyboard', filter by 4+ stars, and list the top 3"
+
+---
+
+## Installation
+
+### Step 1: Load Extension
 
 ```bash
 git clone https://github.com/DrHB/tab-agent
 ```
 
-1. Open `chrome://extensions`
-2. Enable **Developer mode** (top right)
-3. Click **Load unpacked** → select the `extension/` folder
-4. You'll see the Tab Agent icon in your toolbar
+1. Open `chrome://extensions` in your browser
+2. Enable **Developer mode** (toggle in top right)
+3. Click **Load unpacked**
+4. Select the `extension/` folder
+5. You'll see the Tab Agent icon in your toolbar
 
-### 2. Run Setup
+### Step 2: Run Setup
 
 ```bash
 npx tab-agent setup
 ```
 
-This auto-detects your extension and configures everything (native messaging + skills).
+This automatically:
+- Detects your extension ID
+- Configures native messaging
+- Installs the Claude/Codex skill
 
-### 3. Use It
+### Step 3: Activate & Use
 
-1. **Click the Tab Agent icon** on any tab you want to control (turns green = active)
-2. **Ask Claude/Codex:**
-   - "Use tab-agent to search Google for 'best restaurants nearby'"
-   - "Go to my GitHub notifications and summarize them"
-   - "Fill out this form with my details"
+1. Navigate to any webpage
+2. **Click the Tab Agent icon** — it turns green (🟢 ON)
+3. Ask your AI to interact with the page
 
-## Example Use Cases
+---
 
-### Web Research
-```
-"Go to Hacker News and get me the top 5 articles with summaries"
-```
+## Commands Reference
 
-### Authenticated Actions
-```
-"Check my GitHub notifications and mark the resolved ones as read"
-```
-Works because Tab Agent uses your existing GitHub session!
-
-### Form Automation
-```
-"Fill out this job application with my resume details"
-```
-
-### Data Extraction
-```
-"Go to my Twitter timeline and get the last 20 tweets"
-```
-
-## Commands
-
+### Navigation & Viewing
 | Command | Description |
 |---------|-------------|
-| `tabs` | List activated tabs |
-| `snapshot` | Get AI-readable page with refs [e1], [e2]... |
-| `screenshot` | Capture viewport (add `fullPage: true` for full page) |
-| `click` | Click element by ref |
-| `fill` | Fill form field |
-| `type` | Type text (add `submit: true` to press Enter) |
-| `press` | Press key (Enter, Escape, Tab, Arrow keys) |
-| `scroll` | Scroll page up/down |
-| `scrollintoview` | Scroll element into view |
-| `navigate` | Go to URL |
-| `wait` | Wait for text or selector to appear |
-| `evaluate` | Run JavaScript in page context |
-| `batchfill` | Fill multiple fields at once |
-| `dialog` | Handle alert/confirm/prompt dialogs |
+| `tabs` | List all activated tabs |
+| `navigate` | Go to a URL |
+| `snapshot` | Get AI-readable page with element refs |
+| `screenshot` | Capture viewport image |
+| `screenshot fullPage` | Capture entire page |
 
-## CLI Commands
+### Interaction
+| Command | Description |
+|---------|-------------|
+| `click` | Click element by ref |
+| `type` | Type text into element |
+| `type ... submit` | Type and press Enter |
+| `fill` | Fill a form field |
+| `batchfill` | Fill multiple fields at once |
+| `press` | Press a key (Enter, Escape, Tab, Arrows) |
+
+### Page Control
+| Command | Description |
+|---------|-------------|
+| `scroll` | Scroll up/down by amount |
+| `scrollintoview` | Scroll element into view |
+| `wait` | Wait for text or element to appear |
+| `evaluate` | Run JavaScript in page context |
+| `dialog` | Handle alert/confirm/prompt |
+
+---
+
+## CLI Reference
 
 ```bash
-npx tab-agent setup   # Configure everything (run once)
-npx tab-agent status  # Check if everything is working
-npx tab-agent start   # Manually start the relay server
+npx tab-agent setup   # Initial configuration
+npx tab-agent status  # Check if everything works
+npx tab-agent start   # Start relay server manually
 ```
 
-## How It Works
-
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Claude/Codex   │────▶│  Relay Server   │────▶│    Extension    │
-│   (Your AI)     │◀────│  (WebSocket)    │◀────│  (Chrome)       │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                              :9876                     │
-                                                        ▼
-                                               ┌─────────────────┐
-                                               │  Activated Tab  │
-                                               │   (Green = ON)  │
-                                               └─────────────────┘
-```
-
-1. **Extension** runs in Chrome with access to your tabs and sessions
-2. **Relay Server** bridges WebSocket (AI) ↔ Native Messaging (Extension)
-3. **AI** sends commands, receives snapshots/screenshots, takes actions
-
-## Security Model
-
-| Feature | Tab Agent | Traditional Automation |
-|---------|-----------|----------------------|
-| Tab Access | Only activated tabs | All tabs or new browser |
-| Sessions | Uses existing cookies | Requires re-login |
-| Visibility | Green badge shows active | Hidden/background |
-| Audit | Full action logging | Varies |
-| Credentials | Never shared | Often required |
+---
 
 ## Supported Browsers
 
@@ -138,21 +164,50 @@ npx tab-agent start   # Manually start the relay server
 - Microsoft Edge
 - Chromium
 
-The setup automatically detects which browser you're using.
+Setup automatically detects your browser.
+
+---
 
 ## Troubleshooting
 
 **Extension not detected?**
-- Make sure you loaded the `extension/` folder in chrome://extensions
-- Check that Developer mode is enabled
+- Ensure `extension/` folder is loaded in chrome://extensions
+- Developer mode must be enabled
+- Try refreshing the extensions page
 
-**Commands not working?**
-- Click the Tab Agent icon to activate the tab (must show green "ON")
-- Run `npx tab-agent status` to check configuration
+**Tab not responding?**
+- Click the Tab Agent icon — must show green "ON" badge
+- Refresh the page after activating
 
-**Relay not connecting?**
-- Run `npx tab-agent start` manually to see any errors
+**Relay connection issues?**
+- Run `npx tab-agent status` to check config
+- Run `npx tab-agent start` to see error details
+
+---
+
+## How It Works
+
+1. **Chrome Extension** — Runs in your browser with access to activated tabs and your session cookies
+
+2. **Relay Server** — Local WebSocket server (port 9876) that bridges AI ↔ Extension via Chrome's Native Messaging API
+
+3. **Skill File** — Tells Claude/Codex how to send commands to the relay
+
+**Data flow:**
+```
+You: "Search Google for cats"
+ ↓
+Claude/Codex → WebSocket command → Relay Server → Native Messaging → Extension → DOM action
+ ↑
+Results ← WebSocket response ← Relay Server ← Native Messaging ← Page snapshot
+```
+
+---
 
 ## License
 
 MIT
+
+---
+
+**Made for [Claude Code](https://claude.ai/code) and [Codex](https://openai.com/codex)**
