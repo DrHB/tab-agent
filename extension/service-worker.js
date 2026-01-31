@@ -193,12 +193,12 @@ async function routeCommand(tabId, command) {
         try {
           await chrome.debugger.attach({ tabId }, '1.3');
 
-          const { result: layout } = await chrome.debugger.sendCommand(
+          const layout = await chrome.debugger.sendCommand(
             { tabId },
             'Page.getLayoutMetrics'
           );
 
-          const { data } = await chrome.debugger.sendCommand(
+          const screenshot = await chrome.debugger.sendCommand(
             { tabId },
             'Page.captureScreenshot',
             {
@@ -213,6 +213,7 @@ async function routeCommand(tabId, command) {
               }
             }
           );
+          const data = screenshot.data;
 
           await chrome.debugger.detach({ tabId });
           audit('screenshot', { tabId, fullPage: true }, { ok: true });
