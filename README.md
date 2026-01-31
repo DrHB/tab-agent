@@ -33,7 +33,7 @@ Works with Claude, ChatGPT, Codex, and any AI that can run shell commands.
 
 ```bash
 # 1. Install extension
-git clone https://github.com/AiTabPilot/tabpilot
+git clone https://github.com/DrHB/tab-pilot
 # Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
 
 # 2. Setup
@@ -90,7 +90,7 @@ npx tabpilot screenshot              # Capture page (fallback for complex UIs)
 ### 1. Load Extension
 
 ```bash
-git clone https://github.com/AiTabPilot/tabpilot
+git clone https://github.com/DrHB/tab-pilot
 ```
 
 1. Open `chrome://extensions`

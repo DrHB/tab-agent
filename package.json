@@ -42,8 +42,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/AiTabPilot/tabpilot"
+    "url": "https://github.com/DrHB/tab-pilot"
   },
-  "homepage": "https://github.com/AiTabPilot/tabpilot#readme",
+  "homepage": "https://github.com/DrHB/tab-pilot#readme",
   "license": "MIT"
 }
