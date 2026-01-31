@@ -1,6 +1,6 @@
 {
   "name": "tabpilot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Give LLMs full control of your browser - secure, click-to-activate automation for Claude, ChatGPT, Codex, and any AI",
   "bin": {
     "tabpilot": "./bin/tab-agent.js",
