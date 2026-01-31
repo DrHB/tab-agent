@@ -10,23 +10,23 @@ Control browser tabs via CLI. User activates tabs via extension icon (green = ac
 ## Before First Command
 
 ```bash
-curl -s http://localhost:9876/health || (npx web-agent start &)
+curl -s http://localhost:9876/health || (npx ai-web-agent start &)
 sleep 2
 ```
 
 ## Commands
 
 ```bash
-npx web-agent snapshot                # Get page with refs [e1], [e2]...
-npx web-agent click <ref>             # Click element
-npx web-agent type <ref> <text>       # Type text
-npx web-agent fill <ref> <value>      # Fill form field
-npx web-agent press <key>             # Press key (Enter, Escape, Tab)
-npx web-agent scroll <dir> [amount]   # Scroll up/down
-npx web-agent navigate <url>          # Go to URL
-npx web-agent tabs                    # List active tabs
-npx web-agent wait <text|selector>    # Wait for condition
-npx web-agent screenshot              # Capture page (fallback only)
+npx ai-web-agent snapshot                # Get page with refs [e1], [e2]...
+npx ai-web-agent click <ref>             # Click element
+npx ai-web-agent type <ref> <text>       # Type text
+npx ai-web-agent fill <ref> <value>      # Fill form field
+npx ai-web-agent press <key>             # Press key (Enter, Escape, Tab)
+npx ai-web-agent scroll <dir> [amount]   # Scroll up/down
+npx ai-web-agent navigate <url>          # Go to URL
+npx ai-web-agent tabs                    # List active tabs
+npx ai-web-agent wait <text|selector>    # Wait for condition
+npx ai-web-agent screenshot              # Capture page (fallback only)
 ```
 
 ## Workflow
@@ -43,11 +43,11 @@ npx web-agent screenshot              # Capture page (fallback only)
 
 ```bash
 # Search Google
-npx web-agent navigate "https://google.com"
-npx web-agent snapshot
-npx web-agent type e1 "hello world"
-npx web-agent press Enter
-npx web-agent snapshot  # See results
+npx ai-web-agent navigate "https://google.com"
+npx ai-web-agent snapshot
+npx ai-web-agent type e1 "hello world"
+npx ai-web-agent press Enter
+npx ai-web-agent snapshot  # See results
 ```
 
 ## Notes

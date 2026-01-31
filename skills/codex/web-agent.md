@@ -10,22 +10,22 @@ CLI browser control. User activates tabs via extension (green = active).
 ## Start Relay
 
 ```bash
-curl -s http://localhost:9876/health || (npx web-agent start &)
+curl -s http://localhost:9876/health || (npx ai-web-agent start &)
 ```
 
 ## Commands
 
 ```bash
-npx web-agent snapshot          # Page with refs [e1], [e2]...
-npx web-agent click <ref>       # Click element
-npx web-agent type <ref> <text> # Type text
-npx web-agent fill <ref> <val>  # Fill form field
-npx web-agent press <key>       # Enter/Escape/Tab/Arrow*
-npx web-agent scroll <dir> [n]  # Scroll up/down
-npx web-agent navigate <url>    # Go to URL
-npx web-agent tabs              # List active tabs
-npx web-agent wait <text|sel>   # Wait for condition
-npx web-agent screenshot        # Fallback only - if snapshot incomplete
+npx ai-web-agent snapshot          # Page with refs [e1], [e2]...
+npx ai-web-agent click <ref>       # Click element
+npx ai-web-agent type <ref> <text> # Type text
+npx ai-web-agent fill <ref> <val>  # Fill form field
+npx ai-web-agent press <key>       # Enter/Escape/Tab/Arrow*
+npx ai-web-agent scroll <dir> [n]  # Scroll up/down
+npx ai-web-agent navigate <url>    # Go to URL
+npx ai-web-agent tabs              # List active tabs
+npx ai-web-agent wait <text|sel>   # Wait for condition
+npx ai-web-agent screenshot        # Fallback only - if snapshot incomplete
 ```
 
 ## Workflow

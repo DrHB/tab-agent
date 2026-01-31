@@ -52,11 +52,11 @@ Browser Control:
 Workflow: snapshot → click/type → snapshot → repeat
 
 Examples:
-  npx web-agent setup
-  npx web-agent snapshot
-  npx web-agent click e5
-  npx web-agent type e3 "hello world"
-  npx web-agent navigate "https://google.com"
+  npx ai-web-agent setup
+  npx ai-web-agent snapshot
+  npx ai-web-agent click e5
+  npx ai-web-agent type e3 "hello world"
+  npx ai-web-agent navigate "https://google.com"
 
 Version: ${require('../package.json').version}
 `);

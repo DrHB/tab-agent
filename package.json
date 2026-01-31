@@ -1,8 +1,9 @@
 {
-  "name": "web-agent",
+  "name": "ai-web-agent",
   "version": "0.1.0",
   "description": "Give LLMs full control of your browser - secure, click-to-activate browser automation for Claude, Codex, and any AI",
   "bin": {
+    "ai-web-agent": "./bin/tab-agent.js",
     "web-agent": "./bin/tab-agent.js",
     "tab-agent": "./bin/tab-agent.js"
   },

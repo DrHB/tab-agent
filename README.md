@@ -1,6 +1,6 @@
-# Web Agent
+# AI Web Agent
 
-[![npm version](https://img.shields.io/npm/v/web-agent.svg)](https://www.npmjs.com/package/web-agent)
+[![npm version](https://img.shields.io/npm/v/ai-web-agent.svg)](https://www.npmjs.com/package/ai-web-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Give LLMs full control of your browser** — securely, with click-to-activate permission.
@@ -37,7 +37,7 @@ git clone https://github.com/AiGithubWebAgent/web-agent
 # Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
 
 # 2. Setup
-npx web-agent setup
+npx ai-web-agent setup
 
 # 3. Activate & go
 # Click the extension icon on any tab (turns green)
@@ -67,20 +67,20 @@ npx web-agent setup
 
 ```bash
 # Core workflow
-npx web-agent snapshot                # Get page content with refs [e1], [e2]...
-npx web-agent click <ref>             # Click element (e.g., click e5)
-npx web-agent type <ref> <text>       # Type into element
-npx web-agent fill <ref> <value>      # Fill form field
+npx ai-web-agent snapshot                # Get page content with refs [e1], [e2]...
+npx ai-web-agent click <ref>             # Click element (e.g., click e5)
+npx ai-web-agent type <ref> <text>       # Type into element
+npx ai-web-agent fill <ref> <value>      # Fill form field
 
 # Navigation
-npx web-agent navigate <url>          # Go to URL
-npx web-agent scroll <dir> [amount]   # Scroll up/down
-npx web-agent press <key>             # Press key (Enter, Escape, Tab)
+npx ai-web-agent navigate <url>          # Go to URL
+npx ai-web-agent scroll <dir> [amount]   # Scroll up/down
+npx ai-web-agent press <key>             # Press key (Enter, Escape, Tab)
 
 # Utilities
-npx web-agent tabs                    # List active tabs
-npx web-agent wait <text>             # Wait for text to appear
-npx web-agent screenshot              # Capture page (fallback for complex UIs)
+npx ai-web-agent tabs                    # List active tabs
+npx ai-web-agent wait <text>             # Wait for text to appear
+npx ai-web-agent screenshot              # Capture page (fallback for complex UIs)
 ```
 
 **Workflow:** `snapshot` → use refs → `click`/`type` → `snapshot` again → repeat
@@ -101,7 +101,7 @@ git clone https://github.com/AiGithubWebAgent/web-agent
 ### 2. Run Setup
 
 ```bash
-npx web-agent setup
+npx ai-web-agent setup
 ```
 
 This auto-detects your extension and configures everything.
@@ -136,7 +136,7 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 
 **Commands not working?**
 - Click the extension icon — must show green "ON"
-- Run `npx web-agent status` to check configuration
+- Run `npx ai-web-agent status` to check configuration
 
 **No active tabs?**
 - Activate at least one tab by clicking the extension icon
@@ -150,10 +150,10 @@ Your banking, email, and sensitive tabs stay completely isolated unless you expl
 ```
 You: "Find cheap flights to Tokyo"
  ↓
-LLM → npx web-agent navigate "google.com/flights"
-    → npx web-agent snapshot
-    → npx web-agent type e5 "Tokyo"
-    → npx web-agent click e12
+LLM → npx ai-web-agent navigate "google.com/flights"
+    → npx ai-web-agent snapshot
+    → npx ai-web-agent type e5 "Tokyo"
+    → npx ai-web-agent click e12
     → ...
 ```
 

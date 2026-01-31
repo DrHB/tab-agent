@@ -47,7 +47,7 @@ async function status() {
     console.log('Native Host: Installed');
     console.log(`  Extension: ${manifest.allowed_origins[0]}`);
   } else {
-    console.log('Native Host: Not installed (run: npx web-agent setup)');
+    console.log('Native Host: Not installed (run: npx ai-web-agent setup)');
   }
 
   // Check skills
