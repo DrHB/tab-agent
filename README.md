@@ -51,7 +51,7 @@ npx tab-agent setup
 Because Tab Agent runs as a Chrome extension:
 
 - **Uses your existing cookies** — no re-authentication needed
-- **Access any site you're logged into** — GitHub, Twitter, Gmail, internal tools
+- **Access any site you're logged into** — GitHub, X, Gmail, internal tools
 - **Works with SSO and 2FA** — enterprise apps, protected accounts
 - **No credential sharing** — your passwords stay in your browser
 
@@ -75,7 +75,7 @@ Because Tab Agent runs as a Chrome extension:
 > "Fill out this contact form with my details"
 
 **Data Extraction**
-> "Get the last 20 tweets from my timeline with author names"
+> "Get the last 20 posts from my X timeline with author names"
 
 **Multi-step Workflows**
 > "Search Amazon for 'mechanical keyboard', filter by 4+ stars, and list the top 3"
