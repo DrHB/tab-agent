@@ -8,6 +8,10 @@
 
 > No headless browser. No re-authenticating. Your AI uses your actual Chrome sessions.
 
+<p align="center">
+  <img src="assets/toggle-demo.gif" alt="Pin extension and toggle on/off" width="600">
+</p>
+
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │  Claude Code    │────▶│  Relay Server   │────▶│    Extension    │
