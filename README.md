@@ -23,9 +23,9 @@
 
 ## Why Tab Agent?
 
-Most browser automation tools (Playwright, Puppeteer, agent-browser) spin up a **fresh headless browser** — you start logged out of everything.
+Most browser automation tools (Playwright, Puppeteer, agent-browser) spin up a **fresh headless browser** — you start logged out of everything, and many sites actively block them. They detect headless browsers through missing plugins, `navigator.webdriver` flags, and other fingerprints.
 
-Tab Agent is different:
+Tab Agent is different — it uses your real Chrome with your real cookies:
 
 ```
 +---------------+--------------------------------------+----------------------------------+
