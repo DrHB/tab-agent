@@ -4,9 +4,9 @@
 [![Chrome](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white)](https://github.com/DrHB/tab-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Let Claude browse as YOU** — uses your existing logins, click-to-activate security.
+**Let Claude & Codex browse as YOU** — uses your existing logins, click-to-activate security.
 
-> No headless browser. No re-authenticating. Claude uses your actual Chrome sessions.
+> No headless browser. No re-authenticating. Your AI uses your actual Chrome sessions.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -40,7 +40,7 @@ Tab Agent is different:
 +---------------+--------------------------------------+----------------------------------+
 ```
 
-**Use Tab Agent when:** Claude needs to browse as "you" — shopping with your Prime account, checking your GitHub notifications, using sites you're already logged into.
+**Use Tab Agent when:** Claude or Codex needs to browse as "you" — shopping with your Prime account, checking your GitHub notifications, using sites you're already logged into.
 
 **Use headless browsers when:** CI/CD automation, web scraping, or testing with fresh sessions.
 
@@ -65,7 +65,7 @@ npx tab-agent setup
 
 # 3. Activate & go
 # Click extension icon on any tab (turns green)
-# Ask Claude: "Search Amazon for mechanical keyboards and find the best rated"
+# Ask Claude/Codex: "Search Amazon for mechanical keyboards and find the best rated"
 ```
 
 ## Example Tasks
