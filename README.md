@@ -173,7 +173,3 @@ Claude → npx tab-agent navigate "google.com/flights"
 ## License
 
 MIT
-
----
-
-**Keywords:** browser automation, claude code, codex, AI browser control, web automation, agent-browser alternative, playwright alternative, use existing logins, click-to-activate security
