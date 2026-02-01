@@ -27,14 +27,18 @@ Most browser automation tools (Playwright, Puppeteer, agent-browser) spin up a *
 
 Tab Agent is different:
 
-| | Tab Agent | Headless Browsers |
-|---|---|---|
-| **Your logins** | (+) Uses existing sessions | (-) Must re-authenticate |
-| **Security** | (+) Click to activate specific tabs | (-) Full browser access |
-| **Privacy** | (+) Credentials never leave your browser | (-) Agent sees everything |
-| **Detection** | (+) Real browser, real cookies | (-) Often blocked by anti-bot |
-| **Setup** | (+) Uses your Chrome | (-) Downloads separate browser |
-| **Visibility** | (+) Watch in real browser | (-) Runs hidden/headless |
+```
++---------------+--------------------------------------+----------------------------------+
+|               | Tab Agent                            | Headless Browsers                |
++---------------+--------------------------------------+----------------------------------+
+| Your logins   | (+) Uses existing sessions           | (-) Must re-authenticate         |
+| Security      | (+) Click to activate specific tabs  | (-) Full browser access          |
+| Privacy       | (+) Credentials never leave browser  | (-) Agent sees everything        |
+| Detection     | (+) Real browser, real cookies       | (-) Often blocked by anti-bot    |
+| Setup         | (+) Uses your Chrome                 | (-) Downloads separate browser   |
+| Visibility    | (+) Watch in real browser            | (-) Runs hidden/headless         |
++---------------+--------------------------------------+----------------------------------+
+```
 
 **Use Tab Agent when:** Claude needs to browse as "you" — shopping with your Prime account, checking your GitHub notifications, using sites you're already logged into.
 
