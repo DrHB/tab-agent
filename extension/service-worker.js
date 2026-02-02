@@ -2,6 +2,15 @@
 // Tab Agent - Service Worker
 // Manages activated tabs and routes commands to content scripts
 
+// Browser detection
+const IS_SAFARI = typeof browser !== 'undefined' &&
+  navigator.userAgent.includes('Safari') &&
+  !navigator.userAgent.includes('Chrome');
+const IS_CHROME = typeof chrome !== 'undefined' && !IS_SAFARI;
+
+// Safari uses 'browser' namespace, Chrome uses 'chrome'
+const browserAPI = IS_SAFARI ? browser : chrome;
+
 const state = {
   activatedTabs: new Map(), // tabId -> { url, title, activatedAt }
   auditLog: [],
@@ -361,6 +370,17 @@ function connectNativeHost() {
   console.log('Attempting to connect to native host...');
 
   try {
+    if (IS_SAFARI) {
+      // Safari: native messaging is handled by the containing app
+      // The app will inject messages via browser.runtime messaging
+      console.log('Safari detected - native messaging handled by container app');
+      state.nativeConnected = true;
+      state.lastNativeError = null;
+      // Safari extension will receive commands via runtime.onMessage from the app
+      return;
+    }
+
+    // Chrome: use connectNative
     nativePort = chrome.runtime.connectNative('com.tabagent.relay');
     console.log('connectNative called, port created');
 
