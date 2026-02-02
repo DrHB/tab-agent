@@ -7,6 +7,8 @@
 **Let Claude & Codex browse as YOU** — uses your existing logins, click-to-activate security.
 
 > No headless browser. No re-authenticating. Your AI uses your actual Chrome sessions.
+>
+> 🧪 **Safari support is experimental** — [see below](#experimental-safari-support)
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -138,7 +140,9 @@ This auto-detects your extension and configures everything.
 
 Click the Tab Agent icon on any tab you want to control. Green = active.
 
-## Safari Setup (macOS)
+## Experimental Safari Support
+
+> **Note:** Safari support is experimental and requires building from source. The core relay and CLI work, but the Safari extension bridge needs manual Xcode setup. Contributions welcome!
 
 Safari support requires building the menu bar app from source.
 
@@ -225,6 +229,20 @@ Claude → npx tab-agent navigate "google.com/flights"
     → npx tab-agent click e12
     → ...
 ```
+
+## Safari Support Status
+
+Safari support is **experimental**. Here's what works and what needs help:
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Relay server | ✅ Working | Multi-browser connection tracking |
+| CLI --browser flag | ✅ Working | `--browser=safari` / `--browser=chrome` |
+| Browser detection | ✅ Working | Extension detects Safari vs Chrome |
+| Swift menu bar app | 🔨 Needs testing | Compiles, needs real-world testing |
+| Safari Extension target | ⚠️ Manual setup | Requires adding target in Xcode |
+
+**To contribute:** The Safari Extension target needs to be created in Xcode (File → New → Target → Safari Web Extension) and configured to use the shared JS files from `extension/`. PRs welcome!
 
 ## License
 
