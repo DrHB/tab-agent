@@ -8,7 +8,7 @@
 
 > No headless browser. No re-authenticating. Your AI uses your actual Chrome sessions.
 >
-> 🧪 **Safari support is experimental** — [see below](#experimental-safari-support)
+> **Safari support is experimental** — [see below](#experimental-safari-support)
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
