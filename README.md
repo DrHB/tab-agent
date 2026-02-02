@@ -138,6 +138,58 @@ This auto-detects your extension and configures everything.
 
 Click the Tab Agent icon on any tab you want to control. Green = active.
 
+## Safari Setup (macOS)
+
+Safari support requires building the menu bar app from source.
+
+### Prerequisites
+
+- macOS 14+ (Sonoma or later)
+- Xcode 15+ (free from App Store)
+- Node.js 18+
+
+### Setup Steps
+
+1. **Start the relay server** (in a terminal):
+   ```bash
+   npx tab-agent relay
+   ```
+
+2. **Build and run the Safari app**:
+   ```bash
+   cd safari
+   open TabAgent.xcodeproj
+   # Click "Run" in Xcode (⌘R)
+   ```
+
+3. **Enable the extension in Safari**:
+   - Safari → Settings → Extensions
+   - Check "Tab Agent"
+
+4. **Enable unsigned extensions** (required after each Safari restart):
+   - Safari → Develop → Allow Unsigned Extensions
+
+5. **Test the connection**:
+   ```bash
+   npx tab-agent tabs
+   ```
+
+### Using with Both Browsers
+
+If you have both Chrome and Safari set up:
+
+```bash
+# Auto-detect (uses whichever has activated tabs)
+npx tab-agent snapshot
+
+# Explicitly target a browser
+npx tab-agent snapshot --browser=safari
+npx tab-agent snapshot --browser=chrome
+
+# See tabs from all browsers
+npx tab-agent tabs
+```
+
 ## Supported Browsers
 
 - Google Chrome
