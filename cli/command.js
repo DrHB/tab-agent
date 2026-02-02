@@ -182,7 +182,8 @@ function printTabs(msg) {
   }
   console.log('Active tabs:\n');
   msg.tabs.forEach((tab, i) => {
-    console.log(`  ${i + 1}. [${tab.tabId}] ${tab.title}`);
+    const browserTag = tab.browser ? `[${tab.browser}] ` : '';
+    console.log(`  ${i + 1}. ${browserTag}[${tab.tabId}] ${tab.title}`);
     console.log(`     ${tab.url}\n`);
   });
 }

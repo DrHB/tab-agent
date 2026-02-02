@@ -131,6 +131,57 @@ wss.on('connection', (ws, req) => {
 
       console.log(`Command: ${command.action}`, command);
 
+      // Special handling for 'tabs' without specific browser - aggregate from all browsers
+      if (command.action === 'tabs' && !targetBrowser) {
+        const results = { chrome: null, safari: null };
+        let pending = 0;
+
+        const sendAggregated = () => {
+          const allTabs = [];
+          if (results.chrome?.tabs) {
+            results.chrome.tabs.forEach(t => allTabs.push({ ...t, browser: 'chrome' }));
+          }
+          if (results.safari?.tabs) {
+            results.safari.tabs.forEach(t => allTabs.push({ ...t, browser: 'safari' }));
+          }
+          ws.send(JSON.stringify({ id, ok: true, tabs: allTabs }));
+        };
+
+        for (const [browserName, browserWs] of Object.entries(connections)) {
+          if (browserWs) {
+            pending++;
+            const internalId = Date.now() + Math.random();
+
+            const handler = (data) => {
+              const msg = safeParse(data, browserName);
+              if (msg && msg.id === internalId) {
+                results[browserName] = msg;
+                pending--;
+                browserWs.removeListener('message', handler);
+                if (pending === 0) sendAggregated();
+              }
+            };
+            browserWs.on('message', handler);
+            browserWs.send(JSON.stringify({ id: internalId, action: 'tabs' }));
+
+            // Timeout after 2 seconds
+            setTimeout(() => {
+              if (results[browserName] === null) {
+                results[browserName] = { tabs: [] };
+                pending--;
+                browserWs.removeListener('message', handler);
+                if (pending === 0) sendAggregated();
+              }
+            }, 2000);
+          }
+        }
+
+        if (pending === 0) {
+          ws.send(JSON.stringify({ id, ok: false, error: 'No browsers connected' }));
+        }
+        return;
+      }
+
       const connection = getExtensionConnection(targetBrowser);
       if (!connection) {
         const errorMsg = targetBrowser
