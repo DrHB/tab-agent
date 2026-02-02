@@ -4,6 +4,20 @@ const WebSocket = require('ws');
 const COMMANDS = ['tabs', 'snapshot', 'screenshot', 'click', 'type', 'fill', 'press', 'scroll', 'navigate', 'wait', 'evaluate'];
 
 async function runCommand(args) {
+  // Extract --browser flag
+  let targetBrowser = null;
+  const browserFlagIndex = args.findIndex(a => a === '--browser' || a.startsWith('--browser='));
+  if (browserFlagIndex !== -1) {
+    const flag = args[browserFlagIndex];
+    if (flag.includes('=')) {
+      targetBrowser = flag.split('=')[1];
+    } else if (args[browserFlagIndex + 1]) {
+      targetBrowser = args[browserFlagIndex + 1];
+      args.splice(browserFlagIndex + 1, 1);
+    }
+    args.splice(browserFlagIndex, 1);
+  }
+
   const [command, ...params] = args;
 
   if (!command || command === 'help') {
@@ -37,10 +51,10 @@ async function runCommand(args) {
 
     // First get tabs to find tabId
     if (command === 'tabs') {
-      ws.send(JSON.stringify({ id: 1, action: 'tabs' }));
+      ws.send(JSON.stringify({ id: 1, action: 'tabs', browser: targetBrowser }));
     } else {
       // Get active tab first, then run command
-      ws.send(JSON.stringify({ id: 0, action: 'tabs' }));
+      ws.send(JSON.stringify({ id: 0, action: 'tabs', browser: targetBrowser }));
     }
   });
 
@@ -57,7 +71,7 @@ async function runCommand(args) {
 
       const tabId = msg.tabs[0].tabId;
       const payload = buildPayload(command, params, tabId);
-      ws.send(JSON.stringify({ id: 1, ...payload }));
+      ws.send(JSON.stringify({ id: 1, ...payload, browser: targetBrowser }));
       return;
     }
 
@@ -147,10 +161,14 @@ Commands:
   screenshot [--full]       Capture page (fallback)
   evaluate <script>         Run JavaScript
 
+Options:
+  --browser=<chrome|safari>   Target specific browser
+
 Workflow: snapshot → click/type → snapshot → repeat
 
 Examples:
   npx tab-agent snapshot
+  npx tab-agent snapshot --browser=safari
   npx tab-agent click e5
   npx tab-agent type e3 "hello world"
   npx tab-agent navigate "https://google.com"
