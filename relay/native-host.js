@@ -75,7 +75,9 @@ function scheduleReconnect() {
 function connectWebSocket() {
   try {
     ws = new WebSocket('ws://localhost:9876', {
-      headers: { 'x-client-type': 'extension' }
+      headers: {
+        'x-client-type': 'chrome'
+      }
     });
   } catch (error) {
     const now = Date.now();
