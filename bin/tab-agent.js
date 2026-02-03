@@ -2,7 +2,7 @@
 const command = process.argv[2];
 
 // Commands that go to the command module
-const BROWSER_COMMANDS = ['tabs', 'snapshot', 'screenshot', 'click', 'type', 'fill', 'press', 'scroll', 'navigate', 'wait', 'evaluate'];
+const BROWSER_COMMANDS = ['tabs', 'snapshot', 'screenshot', 'click', 'type', 'fill', 'press', 'scroll', 'navigate', 'wait', 'evaluate', 'hover', 'select', 'drag', 'get', 'find', 'cookies', 'storage', 'pdf'];
 
 if (command === '-v' || command === '--version') {
   console.log(require('../package.json').version);
@@ -48,6 +48,14 @@ Browser Control:
   tabs                      List active tabs
   wait <text|selector>      Wait for text or element
   screenshot [--full]       Capture page (fallback)
+  hover <ref>               Hover over element
+  select <ref> <value>      Select dropdown option
+  drag <from> <to>          Drag element to another
+  get <prop> [ref] [attr]   Get text, value, attr, url, title
+  find <by> <query>         Find by text, role, label, placeholder
+  cookies <get|clear>       View or clear cookies
+  storage <get|set|rm|clear> Manage localStorage/sessionStorage
+  pdf [filename.pdf]        Save page as PDF
 
 Workflow: snapshot → click/type → snapshot → repeat
 

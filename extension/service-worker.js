@@ -263,6 +263,26 @@ async function routeCommand(tabId, command) {
       };
     }
 
+    // Handle PDF generation - must be done in service worker via debugger
+    if (command.action === 'pdf') {
+      try {
+        try { await chrome.debugger.detach({ tabId }); } catch {}
+        await chrome.debugger.attach({ tabId }, '1.3');
+        const pdf = await chrome.debugger.sendCommand({ tabId }, 'Page.printToPDF', {
+          printBackground: true,
+          preferCSSPageSize: true,
+        });
+        await chrome.debugger.detach({ tabId });
+        audit('pdf', { tabId }, { ok: true });
+        return { ok: true, pdf: pdf.data, format: 'pdf', encoding: 'base64' };
+      } catch (error) {
+        try { await chrome.debugger.detach({ tabId }); } catch {}
+        const result = { ok: false, error: error.message };
+        audit('pdf', { tabId }, result);
+        return result;
+      }
+    }
+
     const injectResult = await ensureContentScript(tabId);
     if (!injectResult.ok) {
       const result = { ok: false, error: injectResult.error };
@@ -444,6 +464,12 @@ function connectNativeHost() {
           case 'wait':
           case 'scrollintoview':
           case 'batchfill':
+          case 'drag':
+          case 'get':
+          case 'find':
+          case 'cookies':
+          case 'storage':
+          case 'pdf':
             result = await routeCommand(tabId, { action, ...params });
             break;
 

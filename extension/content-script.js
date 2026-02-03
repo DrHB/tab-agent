@@ -246,7 +246,7 @@ if (window.__tabAgent_contentScriptLoaded) {
       };
     }
 
-    return { getElementByRef, snapshot };
+    return { getElementByRef, snapshot, isVisible, getRole, getName, nextRef, storeRef };
   })();
 
   function getElementByRef(ref) {
@@ -394,9 +394,9 @@ if (window.__tabAgent_contentScriptLoaded) {
     return { ok: true, direction, scrollY: window.scrollY };
   }
 
-  // Wait for condition (text, selector, or timeout)
+  // Wait for condition (text, selector, url pattern, or visible ref)
   async function executeWait(params) {
-    const { text, selector, timeout = 30000 } = params;
+    const { text, selector, urlPattern, visibleRef, timeout = 30000 } = params;
     const start = Date.now();
 
     while (Date.now() - start < timeout) {
@@ -405,6 +405,15 @@ if (window.__tabAgent_contentScriptLoaded) {
       }
       if (selector && document.querySelector(selector)) {
         return { ok: true, found: 'selector' };
+      }
+      if (urlPattern && window.location.href.includes(urlPattern)) {
+        return { ok: true, found: 'url', url: window.location.href };
+      }
+      if (visibleRef) {
+        const el = getElementByRef(visibleRef);
+        if (el && snapshotState.isVisible(el)) {
+          return { ok: true, found: 'visible', ref: visibleRef };
+        }
       }
       await new Promise(r => setTimeout(r, 100));
     }
@@ -438,6 +447,158 @@ if (window.__tabAgent_contentScriptLoaded) {
     }
 
     return { ok: results.every(r => r.ok), results };
+  }
+
+  async function executeDrag(params) {
+    const { fromRef, toRef } = params;
+    const fromEl = getElementByRef(fromRef);
+    const toEl = getElementByRef(toRef);
+
+    if (!fromEl) return { ok: false, error: `Element ${fromRef} not found` };
+    if (!toEl) return { ok: false, error: `Element ${toRef} not found` };
+
+    const fromRect = fromEl.getBoundingClientRect();
+    const toRect = toEl.getBoundingClientRect();
+    const fromX = fromRect.left + fromRect.width / 2;
+    const fromY = fromRect.top + fromRect.height / 2;
+    const toX = toRect.left + toRect.width / 2;
+    const toY = toRect.top + toRect.height / 2;
+
+    fromEl.dispatchEvent(new MouseEvent('mousedown', { clientX: fromX, clientY: fromY, bubbles: true }));
+    await new Promise(r => setTimeout(r, 50));
+    fromEl.dispatchEvent(new MouseEvent('mousemove', { clientX: fromX + 5, clientY: fromY + 5, bubbles: true }));
+    await new Promise(r => setTimeout(r, 50));
+    toEl.dispatchEvent(new MouseEvent('mousemove', { clientX: toX, clientY: toY, bubbles: true }));
+    await new Promise(r => setTimeout(r, 50));
+    toEl.dispatchEvent(new MouseEvent('mouseup', { clientX: toX, clientY: toY, bubbles: true }));
+
+    // Also fire dragstart/drop for HTML5 drag-and-drop
+    fromEl.dispatchEvent(new DragEvent('dragstart', { bubbles: true }));
+    toEl.dispatchEvent(new DragEvent('drop', { bubbles: true }));
+    fromEl.dispatchEvent(new DragEvent('dragend', { bubbles: true }));
+
+    return { ok: true, from: fromRef, to: toRef };
+  }
+
+  async function executeGet(params) {
+    const { subcommand, ref, attr } = params;
+
+    if (subcommand === 'url') return { ok: true, result: window.location.href };
+    if (subcommand === 'title') return { ok: true, result: document.title };
+
+    if (!ref) return { ok: false, error: 'No ref provided' };
+    const element = getElementByRef(ref);
+    if (!element) return { ok: false, error: `Element ${ref} not found` };
+
+    switch (subcommand) {
+      case 'text':
+        return { ok: true, result: element.textContent.trim() };
+      case 'html':
+        return { ok: true, result: element.innerHTML };
+      case 'value':
+        return { ok: true, result: element.value || '' };
+      case 'attr':
+        return { ok: true, result: element.getAttribute(attr) };
+      default:
+        return { ok: false, error: `Unknown get subcommand: ${subcommand}` };
+    }
+  }
+
+  async function executeFind(params) {
+    const { by, query } = params;
+    const results = [];
+
+    const matches = [];
+    if (by === 'text') {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+      while (walker.nextNode()) {
+        const el = walker.currentNode;
+        if (el.textContent.trim().toLowerCase().includes(query.toLowerCase()) && snapshotState.isVisible(el)) {
+          matches.push(el);
+          if (matches.length >= 20) break;
+        }
+      }
+    } else if (by === 'role') {
+      const els = document.querySelectorAll(`[role="${query}"]`);
+      const tagRoles = { button: 'button', a: 'link', input: 'textbox', textarea: 'textbox', select: 'combobox', img: 'img' };
+      const tagMatch = Object.entries(tagRoles).find(([, r]) => r === query);
+      if (tagMatch) {
+        document.querySelectorAll(tagMatch[0]).forEach(el => { if (snapshotState.isVisible(el)) matches.push(el); });
+      }
+      els.forEach(el => { if (snapshotState.isVisible(el) && !matches.includes(el)) matches.push(el); });
+    } else if (by === 'label') {
+      const labels = document.querySelectorAll('label');
+      labels.forEach(label => {
+        if (label.textContent.trim().toLowerCase().includes(query.toLowerCase())) {
+          const input = label.control || (label.htmlFor && document.getElementById(label.htmlFor));
+          if (input) matches.push(input);
+        }
+      });
+      // Also search aria-label
+      document.querySelectorAll(`[aria-label*="${query}" i]`).forEach(el => {
+        if (!matches.includes(el)) matches.push(el);
+      });
+    } else if (by === 'placeholder') {
+      document.querySelectorAll(`[placeholder*="${query}" i]`).forEach(el => matches.push(el));
+    } else if (by === 'selector') {
+      document.querySelectorAll(query).forEach(el => { if (snapshotState.isVisible(el)) matches.push(el); });
+    } else {
+      return { ok: false, error: `Unknown find method: ${by}` };
+    }
+
+    // Assign refs to found elements
+    for (const el of matches.slice(0, 20)) {
+      const ref = snapshotState.nextRef();
+      snapshotState.storeRef(ref, el);
+      const role = snapshotState.getRole(el);
+      const name = snapshotState.getName(el);
+      results.push({ ref, role, name: name.substring(0, 100) });
+    }
+
+    return { ok: true, results, count: results.length };
+  }
+
+  async function executeCookies(params) {
+    const { subcommand } = params;
+
+    if (subcommand === 'get') {
+      return { ok: true, result: document.cookie };
+    } else if (subcommand === 'clear') {
+      document.cookie.split(';').forEach(c => {
+        const name = c.split('=')[0].trim();
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+      return { ok: true, cleared: true };
+    } else {
+      return { ok: false, error: `Unknown cookies subcommand: ${subcommand}` };
+    }
+  }
+
+  async function executeStorage(params) {
+    const { subcommand, storageType = 'local', key, value } = params;
+    const store = storageType === 'session' ? sessionStorage : localStorage;
+
+    switch (subcommand) {
+      case 'get':
+        if (key) return { ok: true, result: store.getItem(key) };
+        const all = {};
+        for (let i = 0; i < store.length; i++) {
+          const k = store.key(i);
+          all[k] = store.getItem(k);
+        }
+        return { ok: true, result: all };
+      case 'set':
+        store.setItem(key, value);
+        return { ok: true, key, value };
+      case 'remove':
+        store.removeItem(key);
+        return { ok: true, removed: key };
+      case 'clear':
+        store.clear();
+        return { ok: true, cleared: true };
+      default:
+        return { ok: false, error: `Unknown storage subcommand: ${subcommand}` };
+    }
   }
 
   async function executeNavigate(params) {
@@ -495,6 +656,21 @@ if (window.__tabAgent_contentScriptLoaded) {
           break;
         case 'navigate':
           result = await executeNavigate(params);
+          break;
+        case 'drag':
+          result = await executeDrag(params);
+          break;
+        case 'get':
+          result = await executeGet(params);
+          break;
+        case 'find':
+          result = await executeFind(params);
+          break;
+        case 'cookies':
+          result = await executeCookies(params);
+          break;
+        case 'storage':
+          result = await executeStorage(params);
           break;
         default:
           result = { ok: false, error: `Unknown action: ${action}` };
