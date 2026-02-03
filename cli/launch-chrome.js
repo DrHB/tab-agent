@@ -124,4 +124,27 @@ function launchChrome(profileDir) {
   }
 }
 
-module.exports = { detectProfiles, getChromeUserDataDir, promptForProfile, isChromeRunning, launchChrome };
+function getConfigPath() {
+  return path.join(os.homedir(), '.tab-agent.json');
+}
+
+function loadConfig() {
+  try {
+    return JSON.parse(fs.readFileSync(getConfigPath(), 'utf8'));
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveConfig(config) {
+  const existing = loadConfig();
+  const merged = { ...existing, ...config };
+  fs.writeFileSync(getConfigPath(), JSON.stringify(merged, null, 2));
+}
+
+function getSavedProfile() {
+  const config = loadConfig();
+  return config.profile || null;
+}
+
+module.exports = { detectProfiles, getChromeUserDataDir, promptForProfile, isChromeRunning, launchChrome, loadConfig, saveConfig, getSavedProfile };

@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { findTabAgentExtension, checkExistingManifest, promptForExtensionId } = require('./detect-extension');
+const { detectProfiles, promptForProfile, saveConfig } = require('./launch-chrome');
 
 async function setup() {
   console.log('Tab Agent Setup\n');
@@ -36,7 +37,20 @@ async function setup() {
   installNativeHost(extensionId);
   console.log('✓ Native messaging host installed');
 
-  // 3. Install skills
+  // 3. Select Chrome profile
+  console.log('\nDetecting Chrome profiles...');
+  const profiles = detectProfiles();
+  if (profiles.length > 0) {
+    const selected = await promptForProfile(profiles);
+    if (selected) {
+      saveConfig({ profile: selected.dir });
+      console.log(`✓ Saved default profile: ${selected.name} (${selected.dir})`);
+    }
+  } else {
+    console.log('  No Chrome profiles found, skipping.');
+  }
+
+  // 4. Install skills
   console.log('\nInstalling skills...');
   installSkills();
 

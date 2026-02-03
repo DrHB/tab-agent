@@ -1,7 +1,7 @@
 // cli/start.js
 const path = require('path');
 const { spawn } = require('child_process');
-const { detectProfiles, promptForProfile, isChromeRunning, launchChrome } = require('./launch-chrome');
+const { detectProfiles, promptForProfile, isChromeRunning, launchChrome, getSavedProfile } = require('./launch-chrome');
 
 async function start() {
   // Parse --profile flag
@@ -20,13 +20,15 @@ async function start() {
 
     if (profiles.length > 0) {
       let selected;
-      if (requestedProfile) {
+      // Priority: --profile flag > saved config > interactive prompt
+      const profileToFind = requestedProfile || getSavedProfile();
+      if (profileToFind) {
         selected = profiles.find(p =>
-          p.name.toLowerCase() === requestedProfile.toLowerCase() ||
-          p.dir.toLowerCase() === requestedProfile.toLowerCase()
+          p.name.toLowerCase() === profileToFind.toLowerCase() ||
+          p.dir.toLowerCase() === profileToFind.toLowerCase()
         );
         if (!selected) {
-          console.log(`Profile "${requestedProfile}" not found. Available profiles:`);
+          console.log(`Profile "${profileToFind}" not found. Available profiles:`);
           profiles.forEach(p => console.log(`  - ${p.name} (${p.dir})`));
           process.exit(1);
         }
