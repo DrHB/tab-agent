@@ -54,6 +54,7 @@ Tab Agent is different — it uses your real Chrome with your real cookies:
 - **Click-to-activate security** — only tabs you explicitly enable, others stay private
 - **AI-optimized snapshots** — pages converted to text with refs `[e1]`, `[e2]` for easy targeting
 - **Works with Claude Code & Codex** — installs skills automatically
+- **Auto-launches Chrome** — starts Chrome with profile selection if not already running
 
 ## Quick Start
 
@@ -139,6 +140,32 @@ This auto-detects your extension and configures everything.
 ### 3. Activate Tabs
 
 Click the Tab Agent icon on any tab you want to control. Green = active.
+
+## Auto-Launch Chrome
+
+When you run `npx tab-agent start`, Chrome is automatically launched if it's not already running. You'll be prompted to select which Chrome profile to use:
+
+```
+Chrome is not running.
+
+Chrome Profiles:
+  1. Person 1 (Default)
+  2. Work (Profile 1)
+  3. Personal (Profile 2)
+
+Select profile [1-3]:
+```
+
+### Non-Interactive Mode
+
+Skip the prompt with the `--profile` flag:
+
+```bash
+npx tab-agent start --profile="Profile 1"
+npx tab-agent start --profile="Work"
+```
+
+The flag matches by profile name or directory name (case-insensitive). If Chrome is already running, the prompt is skipped entirely.
 
 ## Experimental Safari Support
 
