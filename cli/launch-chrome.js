@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const readline = require('readline');
+const { execSync, spawn } = require('child_process');
 
 function getChromeUserDataDir() {
   const home = os.homedir();
@@ -80,4 +81,47 @@ async function promptForProfile(profiles) {
   });
 }
 
-module.exports = { detectProfiles, getChromeUserDataDir, promptForProfile };
+function isChromeRunning() {
+  const platform = os.platform();
+  try {
+    if (platform === 'darwin') {
+      execSync('pgrep -x "Google Chrome"', { stdio: 'ignore' });
+      return true;
+    } else if (platform === 'linux') {
+      execSync('pgrep -x chrome', { stdio: 'ignore' });
+      return true;
+    } else if (platform === 'win32') {
+      const result = execSync('tasklist /FI "IMAGENAME eq chrome.exe" /NH', { encoding: 'utf8' });
+      return result.includes('chrome.exe');
+    }
+  } catch (e) {}
+  return false;
+}
+
+function launchChrome(profileDir) {
+  const platform = os.platform();
+  const args = profileDir ? [`--profile-directory=${profileDir}`] : [];
+
+  if (platform === 'darwin') {
+    spawn('open', ['-a', 'Google Chrome', '--args', ...args], {
+      detached: true,
+      stdio: 'ignore'
+    }).unref();
+  } else if (platform === 'linux') {
+    spawn('google-chrome', args, {
+      detached: true,
+      stdio: 'ignore'
+    }).unref();
+  } else if (platform === 'win32') {
+    const chromePath = path.join(
+      process.env.PROGRAMFILES || 'C:\\Program Files',
+      'Google\\Chrome\\Application\\chrome.exe'
+    );
+    spawn(chromePath, args, {
+      detached: true,
+      stdio: 'ignore'
+    }).unref();
+  }
+}
+
+module.exports = { detectProfiles, getChromeUserDataDir, promptForProfile, isChromeRunning, launchChrome };
