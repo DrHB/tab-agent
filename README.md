@@ -48,7 +48,7 @@ Tab Agent is different — it uses your real Chrome with your real cookies:
 
 ## Features
 
-- **Full browser control** — navigate, click, type, scroll, screenshot, run JavaScript
+- **Full browser control** — navigate, click, type, scroll, hover, drag, screenshot, PDF, run JavaScript
 - **Uses your login sessions** — access GitHub, Gmail, Amazon without sharing credentials
 - **Runs in background** — relay starts automatically, works while you do other things
 - **Click-to-activate security** — only tabs you explicitly enable, others stay private
@@ -103,15 +103,39 @@ npx tab-agent click <ref>             # Click element (e.g., click e5)
 npx tab-agent type <ref> <text>       # Type into element
 npx tab-agent fill <ref> <value>      # Fill form field
 
-# Navigation
+# Navigation & interaction
 npx tab-agent navigate <url>          # Go to URL
 npx tab-agent scroll <dir> [amount]   # Scroll up/down
 npx tab-agent press <key>             # Press key (Enter, Escape, Tab)
+npx tab-agent hover <ref>             # Hover over element
+npx tab-agent select <ref> <value>    # Select dropdown option
+npx tab-agent drag <from> <to>        # Drag and drop between elements
+
+# Data extraction
+npx tab-agent get text <ref>          # Get element text
+npx tab-agent get value <ref>         # Get input value
+npx tab-agent get attr <ref> href     # Get element attribute
+npx tab-agent get url                 # Get current URL
+npx tab-agent get title               # Get page title
+
+# Semantic locators
+npx tab-agent find text "Submit"      # Find elements by text
+npx tab-agent find role button        # Find by ARIA role
+npx tab-agent find label "Email"      # Find by label text
+npx tab-agent find placeholder "Search" # Find by placeholder
 
 # Utilities
 npx tab-agent tabs                    # List active tabs
 npx tab-agent wait <text>             # Wait for text to appear
-npx tab-agent screenshot              # Capture page (fallback for complex UIs)
+npx tab-agent wait --url <pattern>    # Wait for URL to match
+npx tab-agent wait --visible <ref>    # Wait for element to be visible
+npx tab-agent screenshot [--full]     # Capture page (fallback for complex UIs)
+npx tab-agent pdf [filename.pdf]      # Save page as PDF
+npx tab-agent evaluate <script>       # Run JavaScript
+npx tab-agent cookies get             # View cookies
+npx tab-agent cookies clear           # Clear cookies
+npx tab-agent storage get [key]       # Read localStorage
+npx tab-agent storage set <key> <val> # Write localStorage
 ```
 
 **Workflow:** `snapshot` → use refs → `click`/`type` → `snapshot` again → repeat
