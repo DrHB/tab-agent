@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const readline = require('readline');
 
 function getChromeUserDataDir() {
   const home = os.homedir();
@@ -44,4 +45,39 @@ function detectProfiles() {
   return profiles;
 }
 
-module.exports = { detectProfiles, getChromeUserDataDir };
+async function promptForProfile(profiles) {
+  if (profiles.length === 0) {
+    console.log('No Chrome profiles found.');
+    return null;
+  }
+
+  if (profiles.length === 1) {
+    console.log(`Using profile: ${profiles[0].name}`);
+    return profiles[0];
+  }
+
+  console.log('\nChrome Profiles:');
+  profiles.forEach((p, i) => {
+    console.log(`  ${i + 1}. ${p.name} (${p.dir})`);
+  });
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise((resolve) => {
+    rl.question(`\nSelect profile [1-${profiles.length}]: `, (answer) => {
+      rl.close();
+      const idx = parseInt(answer, 10) - 1;
+      if (idx >= 0 && idx < profiles.length) {
+        resolve(profiles[idx]);
+      } else {
+        console.log('Invalid selection, using first profile.');
+        resolve(profiles[0]);
+      }
+    });
+  });
+}
+
+module.exports = { detectProfiles, getChromeUserDataDir, promptForProfile };
