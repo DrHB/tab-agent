@@ -1,13 +1,4 @@
-## Banner Option 1 — Pixel Art
-![Banner Pixel](./banner-pixel-1.svg)
-
-## Banner Option 2 — ASCII Terminal
-![Banner ASCII](./banner-ascii-2.svg)
-
-## Banner Option 3 — Retro CRT
-![Banner Retro](./banner-retro-3.svg)
-
----
+![Tab Agent](./banner-pixel-1.svg)
 
 # Tab Agent
 
