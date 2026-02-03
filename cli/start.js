@@ -4,13 +4,35 @@ const { spawn } = require('child_process');
 const { detectProfiles, promptForProfile, isChromeRunning, launchChrome } = require('./launch-chrome');
 
 async function start() {
+  // Parse --profile flag
+  const profileFlag = process.argv.find(a => a.startsWith('--profile'));
+  let requestedProfile = null;
+  if (profileFlag) {
+    requestedProfile = profileFlag.includes('=')
+      ? profileFlag.split('=')[1]
+      : process.argv[process.argv.indexOf(profileFlag) + 1];
+  }
+
   // Launch Chrome if not running
   if (!isChromeRunning()) {
     console.log('Chrome is not running.\n');
     const profiles = detectProfiles();
 
     if (profiles.length > 0) {
-      const selected = await promptForProfile(profiles);
+      let selected;
+      if (requestedProfile) {
+        selected = profiles.find(p =>
+          p.name.toLowerCase() === requestedProfile.toLowerCase() ||
+          p.dir.toLowerCase() === requestedProfile.toLowerCase()
+        );
+        if (!selected) {
+          console.log(`Profile "${requestedProfile}" not found. Available profiles:`);
+          profiles.forEach(p => console.log(`  - ${p.name} (${p.dir})`));
+          process.exit(1);
+        }
+      } else {
+        selected = await promptForProfile(profiles);
+      }
       if (selected) {
         console.log(`\nLaunching Chrome with profile "${selected.name}"...`);
         launchChrome(selected.dir);
