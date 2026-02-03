@@ -6,3 +6,4 @@ docs/
 promotions/
 tmp/
 .worktrees/
+.tab-agent.json
