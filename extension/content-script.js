@@ -283,17 +283,25 @@ if (window.__tabAgent_contentScriptLoaded) {
 
     element.focus();
 
-    for (const char of text) {
-      element.dispatchEvent(new KeyboardEvent('keydown', { key: char, bubbles: true }));
-      element.dispatchEvent(new KeyboardEvent('keypress', { key: char, bubbles: true }));
+    const isContentEditable = element.contentEditable === 'true' || element.isContentEditable;
 
-      if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-        element.value += char;
-        element.dispatchEvent(new Event('input', { bubbles: true }));
+    if (isContentEditable) {
+      // For contentEditable elements (rich text editors like Gemini, Notion, etc.)
+      // Use document.execCommand which triggers proper input events
+      document.execCommand('insertText', false, text);
+    } else {
+      for (const char of text) {
+        element.dispatchEvent(new KeyboardEvent('keydown', { key: char, bubbles: true }));
+        element.dispatchEvent(new KeyboardEvent('keypress', { key: char, bubbles: true }));
+
+        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+          element.value += char;
+          element.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        element.dispatchEvent(new KeyboardEvent('keyup', { key: char, bubbles: true }));
+        await new Promise(r => setTimeout(r, 10));
       }
-
-      element.dispatchEvent(new KeyboardEvent('keyup', { key: char, bubbles: true }));
-      await new Promise(r => setTimeout(r, 10));
     }
 
     // Handle submit if requested
@@ -318,12 +326,20 @@ if (window.__tabAgent_contentScriptLoaded) {
     }
 
     element.focus();
-    element.value = '';
-    element.dispatchEvent(new Event('input', { bubbles: true }));
 
-    element.value = value;
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
+    const isContentEditable = element.contentEditable === 'true' || element.isContentEditable;
+
+    if (isContentEditable) {
+      // Clear and fill contentEditable elements
+      element.textContent = '';
+      document.execCommand('insertText', false, value);
+    } else {
+      element.value = '';
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+      element.value = value;
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 
     return { ok: true, ref, filled: value };
   }
