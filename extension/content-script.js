@@ -510,10 +510,19 @@ if (window.__tabAgent_contentScriptLoaded) {
 
     const matches = [];
     if (by === 'text') {
+      const lowerQuery = query.toLowerCase();
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
       while (walker.nextNode()) {
         const el = walker.currentNode;
-        if (el.textContent.trim().toLowerCase().includes(query.toLowerCase()) && snapshotState.isVisible(el)) {
+        if (!snapshotState.isVisible(el)) continue;
+        // Prefer elements with direct text match (not just inherited from children)
+        let directText = '';
+        for (const node of el.childNodes) {
+          if (node.nodeType === Node.TEXT_NODE) directText += node.textContent;
+        }
+        const hasDirectMatch = directText.trim().toLowerCase().includes(lowerQuery);
+        const isLeafLike = el.children.length <= 2;
+        if (hasDirectMatch || (isLeafLike && el.textContent.trim().toLowerCase().includes(lowerQuery))) {
           matches.push(el);
           if (matches.length >= 20) break;
         }
