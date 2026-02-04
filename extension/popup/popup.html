@@ -115,12 +115,69 @@
       color: #666;
       text-align: center;
     }
+
+    .auto-activate {
+      margin-bottom: 12px;
+      padding: 10px;
+      background: #2a2a3e;
+      border-radius: 6px;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .toggle input { display: none; }
+
+    .toggle-slider {
+      width: 36px;
+      height: 20px;
+      background: #444;
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: #3b82f6;
+    }
+
+    .toggle input:checked + .toggle-slider::after {
+      transform: translateX(16px);
+    }
+
+    .toggle-label { color: #ccc; }
   </style>
 </head>
 <body>
   <h1>Tab Agent</h1>
 
   <div id="status" class="status disconnected">Checking connection...</div>
+
+  <div class="auto-activate">
+    <label class="toggle">
+      <input type="checkbox" id="autoActivateToggle">
+      <span class="toggle-slider"></span>
+      <span class="toggle-label">Auto-activate all tabs</span>
+    </label>
+  </div>
 
   <div class="current-tab">
     <div class="label">Current Tab</div>

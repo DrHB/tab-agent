@@ -19,7 +19,8 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Tab Agent - Click to toggle",
+    "default_title": "Tab Agent - Click to manage",
+    "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

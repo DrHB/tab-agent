@@ -392,15 +392,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-// Handle extension icon click - toggle activation
-chrome.action.onClicked.addListener(async (tab) => {
-  if (state.activatedTabs.has(tab.id)) {
-    deactivateTab(tab.id);
-  } else {
-    await activateTab(tab.id);
-  }
-});
-
 // Update badge when switching tabs
 chrome.tabs.onActivated.addListener(({ tabId }) => {
   updateBadge(tabId);

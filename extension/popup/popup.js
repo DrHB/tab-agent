@@ -12,6 +12,22 @@ async function init() {
   await refreshActivatedTabs();
   updateActivateButton();
   checkConnection();
+
+  // Load auto-activate state
+  const autoResponse = await chrome.runtime.sendMessage({ action: 'getAutoActivate' });
+  const toggle = document.getElementById('autoActivateToggle');
+  if (autoResponse && autoResponse.ok) {
+    toggle.checked = autoResponse.autoActivateAll;
+  }
+
+  toggle.addEventListener('change', async () => {
+    await chrome.runtime.sendMessage({
+      action: 'setAutoActivate',
+      enabled: toggle.checked
+    });
+    await refreshActivatedTabs();
+    updateActivateButton();
+  });
 }
 
 async function refreshActivatedTabs() {
