@@ -412,9 +412,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     info.url = changeInfo.url;
     info.title = tab.title;
   }
-  if (changeInfo.status === 'complete' && state.activatedTabs.has(tabId)) {
-    ensureContentScript(tabId);
-    updateBadge(tabId);
+  if (changeInfo.status === 'complete') {
+    if (state.autoActivateAll && !state.activatedTabs.has(tabId) && tab.url && !tab.url.startsWith('chrome://')) {
+      activateTab(tabId);
+    } else if (state.activatedTabs.has(tabId)) {
+      ensureContentScript(tabId);
+      updateBadge(tabId);
+    }
   }
 });
 
