@@ -366,6 +366,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         result = listActivatedTabs();
         break;
 
+      case 'getAutoActivate':
+        result = { ok: true, autoActivateAll: state.autoActivateAll };
+        break;
+
+      case 'setAutoActivate': {
+        state.autoActivateAll = params.enabled;
+        chrome.storage.local.set({ autoActivateAll: params.enabled });
+        updateAutoActivateBadge();
+        if (params.enabled) {
+          autoActivateExistingTabs();
+        }
+        audit('setAutoActivate', { enabled: params.enabled }, { ok: true });
+        result = { ok: true, autoActivateAll: params.enabled };
+        break;
+      }
+
       default:
         result = { ok: false, error: `Unknown action: ${action}` };
     }
