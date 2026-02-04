@@ -16,7 +16,17 @@ const state = {
   auditLog: [],
   nativeConnected: false,
   lastNativeError: null,
+  autoActivateAll: false,
 };
+
+// Load auto-activate setting from storage on startup
+chrome.storage.local.get(['autoActivateAll'], (result) => {
+  if (result.autoActivateAll) {
+    state.autoActivateAll = true;
+    autoActivateExistingTabs();
+    updateAutoActivateBadge();
+  }
+});
 
 // Dialog handling with chrome.debugger
 const pendingDialogs = new Map();
@@ -69,6 +79,31 @@ function updateBadge(tabId) {
     tabId,
     title: isActive ? 'Tab Agent - Active (click to deactivate)' : 'Tab Agent - Click to activate'
   });
+}
+
+// Update badge to show AUTO mode
+function updateAutoActivateBadge() {
+  if (state.autoActivateAll) {
+    chrome.action.setBadgeText({ text: 'AUTO' });
+    chrome.action.setBadgeBackgroundColor({ color: '#3b82f6' });
+    chrome.action.setTitle({ title: 'Tab Agent - Auto-activate ON (click to manage)' });
+  } else {
+    chrome.action.setBadgeText({ text: '' });
+    chrome.action.setTitle({ title: 'Tab Agent - Click to manage' });
+    for (const [tabId] of state.activatedTabs) {
+      updateBadge(tabId);
+    }
+  }
+}
+
+// Activate all existing tabs
+async function autoActivateExistingTabs() {
+  const tabs = await chrome.tabs.query({});
+  for (const tab of tabs) {
+    if (!state.activatedTabs.has(tab.id) && tab.url && !tab.url.startsWith('chrome://')) {
+      await activateTab(tab.id);
+    }
+  }
 }
 
 // Log all actions for audit trail
