@@ -72,12 +72,13 @@ async function handleDialog(tabId, accept, promptText = '') {
 
 // Update badge for a tab
 function updateBadge(tabId) {
+  if (state.autoActivateAll) return;
   const isActive = state.activatedTabs.has(tabId);
   chrome.action.setBadgeText({ tabId, text: isActive ? 'ON' : '' });
   chrome.action.setBadgeBackgroundColor({ tabId, color: isActive ? '#22c55e' : '#666' });
   chrome.action.setTitle({
     tabId,
-    title: isActive ? 'Tab Agent - Active (click to deactivate)' : 'Tab Agent - Click to activate'
+    title: isActive ? 'Tab Agent - Active' : 'Tab Agent - Click to manage'
   });
 }
 
@@ -371,14 +372,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
 
       case 'setAutoActivate': {
-        state.autoActivateAll = params.enabled;
-        chrome.storage.local.set({ autoActivateAll: params.enabled });
+        state.autoActivateAll = !!params.enabled;
+        chrome.storage.local.set({ autoActivateAll: state.autoActivateAll });
         updateAutoActivateBadge();
-        if (params.enabled) {
-          autoActivateExistingTabs();
+        if (state.autoActivateAll) {
+          await autoActivateExistingTabs();
         }
-        audit('setAutoActivate', { enabled: params.enabled }, { ok: true });
-        result = { ok: true, autoActivateAll: params.enabled };
+        audit('setAutoActivate', { enabled: state.autoActivateAll }, { ok: true });
+        result = { ok: true, autoActivateAll: state.autoActivateAll };
         break;
       }
 
