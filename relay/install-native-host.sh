@@ -2,7 +2,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-HOST_NAME="com.tabpilot.relay"
+HOST_NAME="com.tabagent.relay"
 HOST_DIR="$HOME/Library/Application Support/TabAgent"
 WRAPPER_PATH="$HOST_DIR/native-host-wrapper.sh"
 
@@ -40,7 +40,7 @@ cp -R "$SCRIPT_DIR/node_modules" "$HOST_DIR/node_modules"
 cat > "$MANIFEST_DIR/$HOST_NAME.json" << EOF
 {
   "name": "$HOST_NAME",
-  "description": "TabPilot Native Messaging Host",
+  "description": "Tab Agent Native Messaging Host",
   "path": "$WRAPPER_PATH",
   "type": "stdio",
   "allowed_origins": [

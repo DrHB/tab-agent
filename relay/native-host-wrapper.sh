@@ -6,7 +6,7 @@ cd "$SCRIPT_DIR"
 
 LOG_FILE="$SCRIPT_DIR/wrapper.log"
 echo "$(date): Starting native host from $SCRIPT_DIR" >> "$LOG_FILE"
-export TAB_AGENT_LOG="/tmp/tabpilot-native-host.log"
+export TAB_AGENT_LOG="/tmp/tab-agent-native-host.log"
 
 NODE_BIN="/opt/homebrew/bin/node"
 if [ ! -x "$NODE_BIN" ]; then
