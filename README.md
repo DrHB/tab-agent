@@ -52,7 +52,7 @@ Tab Agent is different — it uses your real Chrome with your real cookies:
 
 - **Full browser control** — navigate, click, type, scroll, hover, drag, screenshot, PDF, run JavaScript
 - **Uses your login sessions** — access GitHub, Gmail, Amazon without sharing credentials
-- **Runs in background** — relay starts automatically, works while you do other things
+- **Runs in background** — run `npx tab-agent start` once, then use commands while it stays running
 - **Click-to-activate security** — only tabs you explicitly enable, others stay private
 - **AI-optimized snapshots** — pages converted to text with refs `[e1]`, `[e2]` for easy targeting
 - **Works with Claude Code & Codex** — installs skills automatically
@@ -68,7 +68,10 @@ git clone https://github.com/DrHB/tab-agent
 # 2. Setup
 npx tab-agent setup
 
-# 3. Activate & go
+# 3. Start relay
+npx tab-agent start
+
+# 4. Activate & go
 # Click extension icon on any tab (turns green)
 # Ask Claude/Codex: "Search Amazon for mechanical keyboards and find the best rated"
 ```
@@ -138,6 +141,8 @@ npx tab-agent cookies get             # View cookies
 npx tab-agent cookies clear           # Clear cookies
 npx tab-agent storage get [key]       # Read localStorage
 npx tab-agent storage set <key> <val> # Write localStorage
+npx tab-agent storage remove <key>    # Remove localStorage key (or use rm)
+npx tab-agent storage clear           # Clear localStorage
 ```
 
 **Workflow:** `snapshot` → use refs → `click`/`type` → `snapshot` again → repeat
@@ -163,7 +168,15 @@ npx tab-agent setup
 
 This auto-detects your extension and configures everything.
 
-### 3. Activate Tabs
+### 3. Start Relay
+
+```bash
+npx tab-agent start
+```
+
+Keep this running in a terminal while you use `tab-agent` commands.
+
+### 4. Activate Tabs
 
 Click the Tab Agent icon on any tab you want to control. Green = active.
 
@@ -195,9 +208,7 @@ The flag matches by profile name or directory name (case-insensitive). If Chrome
 
 ## Experimental Safari Support
 
-> **Note:** Safari support is experimental and requires building from source. The core relay and CLI work, but the Safari extension bridge needs manual Xcode setup. Contributions welcome!
-
-Safari support requires building the menu bar app from source.
+> **Note:** Safari support is experimental and requires source build steps. Relay + CLI routing work, but Safari packaging is still manual in Xcode.
 
 ### Prerequisites
 
@@ -209,26 +220,32 @@ Safari support requires building the menu bar app from source.
 
 1. **Start the relay server** (in a terminal):
    ```bash
-   npx tab-agent relay
+   npx tab-agent start
    ```
 
-2. **Build and run the Safari app**:
+2. **Open the Safari Swift package in Xcode**:
    ```bash
-   cd safari
-   open TabAgent.xcodeproj
-   # Click "Run" in Xcode (⌘R)
+   open -a Xcode safari/Package.swift
    ```
 
-3. **Enable the extension in Safari**:
+3. **Create/configure a Safari Web Extension target in Xcode**:
+   - File → New → Target → Safari Web Extension
+   - Point it to the shared extension assets in `extension/`
+   - Use `extension/manifest.safari.json` settings as the Safari manifest baseline
+
+4. **Run the app target**:
+   - Click "Run" in Xcode (⌘R)
+
+5. **Enable the extension in Safari**:
    - Safari → Settings → Extensions
    - Check "Tab Agent"
 
-4. **Enable unsigned extensions** (required after each Safari restart):
+6. **Enable unsigned extensions** (required after each Safari restart):
    - Safari → Develop → Allow Unsigned Extensions
 
-5. **Test the connection**:
+7. **Test the connection**:
    ```bash
-   npx tab-agent tabs
+   npx tab-agent tabs --browser=safari
    ```
 
 ### Using with Both Browsers
@@ -253,6 +270,7 @@ npx tab-agent tabs
 - Brave
 - Microsoft Edge
 - Chromium
+- Safari (experimental, manual source setup)
 
 ## Troubleshooting
 
@@ -261,6 +279,7 @@ npx tab-agent tabs
 - Reload the extension
 
 **Commands not working?**
+- Make sure relay is running: `npx tab-agent start`
 - Click the extension icon — must show green "ON"
 - Run `npx tab-agent status` to check configuration
 
@@ -270,7 +289,7 @@ npx tab-agent tabs
 ## How It Works
 
 1. **Chrome Extension** — Injects into activated tabs, captures DOM snapshots
-2. **Relay Server** — Bridges AI ↔ Extension via Chrome Native Messaging (runs in background)
+2. **Relay Server** — Bridges AI ↔ Extension via native messaging (run with `npx tab-agent start`)
 3. **CLI** — Simple commands for Claude Code and Codex
 
 ```
@@ -282,20 +301,6 @@ Claude → npx tab-agent navigate "google.com/flights"
     → npx tab-agent click e12
     → ...
 ```
-
-## Safari Support Status
-
-Safari support is **experimental**. Here's what works and what needs help:
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Relay server | ✅ Working | Multi-browser connection tracking |
-| CLI --browser flag | ✅ Working | `--browser=safari` / `--browser=chrome` |
-| Browser detection | ✅ Working | Extension detects Safari vs Chrome |
-| Swift menu bar app | 🔨 Needs testing | Compiles, needs real-world testing |
-| Safari Extension target | ⚠️ Manual setup | Requires adding target in Xcode |
-
-**To contribute:** The Safari Extension target needs to be created in Xcode (File → New → Target → Safari Web Extension) and configured to use the shared JS files from `extension/`. PRs welcome!
 
 ## License
 

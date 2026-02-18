@@ -169,7 +169,7 @@ function buildPayload(command, params, tabId) {
       payload.subcommand = params[0]; // get, clear
       break;
     case 'storage':
-      payload.subcommand = params[0]; // get, set, remove, clear
+      payload.subcommand = params[0] === 'rm' ? 'remove' : params[0]; // get, set, remove, clear
       payload.storageType = params.includes('--session') ? 'session' : 'local';
       // Filter out --session flag
       const storageParams = params.filter(p => p !== '--session');
@@ -207,7 +207,7 @@ Commands:
   get <prop> [ref] [attr]   Get text, value, attr, url, title
   find <by> <query>         Find by text, role, label, placeholder, selector
   cookies <get|clear>       View or clear cookies
-  storage <get|set|rm|clear> Manage localStorage/sessionStorage
+  storage <get|set|remove|rm|clear> Manage localStorage/sessionStorage
   pdf [filename.pdf]        Save page as PDF
 
 Options:

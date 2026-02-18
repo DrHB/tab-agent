@@ -51,11 +51,24 @@ async function status() {
   }
 
   // Check skills
-  const claudeSkill = path.join(home, '.claude', 'skills', 'tab-agent.md');
-  const codexSkill = path.join(home, '.codex', 'skills', 'tab-agent.md');
+  const claudeSkill = path.join(home, '.claude', 'skills', 'tab-agent', 'SKILL.md');
+  const codexSkill = path.join(home, '.codex', 'skills', 'tab-agent', 'SKILL.md');
+  const legacyClaudeSkill = path.join(home, '.claude', 'skills', 'tab-agent.md');
+  const legacyCodexSkill = path.join(home, '.codex', 'skills', 'tab-agent.md');
 
-  console.log(`\nClaude Skill: ${fs.existsSync(claudeSkill) ? 'Installed' : 'Not installed'}`);
-  console.log(`Codex Skill:  ${fs.existsSync(codexSkill) ? 'Installed' : 'Not installed (optional)'}`);
+  const claudeSkillStatus = fs.existsSync(claudeSkill)
+    ? 'Installed'
+    : fs.existsSync(legacyClaudeSkill)
+      ? 'Installed (legacy path)'
+      : 'Not installed';
+  const codexSkillStatus = fs.existsSync(codexSkill)
+    ? 'Installed'
+    : fs.existsSync(legacyCodexSkill)
+      ? 'Installed (legacy path)'
+      : 'Not installed (optional)';
+
+  console.log(`\nClaude Skill: ${claudeSkillStatus}`);
+  console.log(`Codex Skill:  ${codexSkillStatus}`);
 
   // Check relay server
   console.log('\nRelay Server:');
@@ -63,7 +76,7 @@ async function status() {
   if (relayStatus.running) {
     console.log(`  Status: Running (${relayStatus.clients} client${relayStatus.clients !== 1 ? 's' : ''})`);
   } else {
-    console.log('  Status: Not running (starts automatically when needed)');
+    console.log('  Status: Not running (start with: npx tab-agent start)');
   }
 }
 

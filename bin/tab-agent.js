@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const command = process.argv[2];
+const hasHelpFlag = process.argv.includes('--help') || process.argv.includes('-h');
 
 // Commands that go to the command module
 const BROWSER_COMMANDS = ['tabs', 'snapshot', 'screenshot', 'click', 'type', 'fill', 'press', 'scroll', 'navigate', 'wait', 'evaluate', 'hover', 'select', 'drag', 'get', 'find', 'cookies', 'storage', 'pdf'];
@@ -13,6 +14,9 @@ if (BROWSER_COMMANDS.includes(command)) {
   const { runCommand } = require('../cli/command.js');
   runCommand(process.argv.slice(2));
 } else {
+  if (hasHelpFlag) {
+    showHelp(0);
+  }
   switch (command) {
     case 'setup':
       require('../cli/setup.js');
@@ -28,9 +32,9 @@ if (BROWSER_COMMANDS.includes(command)) {
   }
 }
 
-function showHelp() {
+function showHelp(exitCode = null) {
   console.log(`
-tabpilot - Give LLMs full control of your browser
+tab-agent - Give LLMs full control of your browser
 
 Setup:
   setup    Auto-detect extension, configure native messaging
@@ -52,22 +56,25 @@ Browser Control:
   select <ref> <value>      Select dropdown option
   drag <from> <to>          Drag element to another
   get <prop> [ref] [attr]   Get text, value, attr, url, title
-  find <by> <query>         Find by text, role, label, placeholder
+  find <by> <query>         Find by text, role, label, placeholder, selector
   cookies <get|clear>       View or clear cookies
-  storage <get|set|rm|clear> Manage localStorage/sessionStorage
+  storage <get|set|remove|rm|clear> Manage localStorage/sessionStorage
   pdf [filename.pdf]        Save page as PDF
 
 Workflow: snapshot → click/type → snapshot → repeat
 
 Examples:
-  npx tabpilot setup
-  npx tabpilot snapshot
-  npx tabpilot click e5
-  npx tabpilot type e3 "hello world"
-  npx tabpilot navigate "https://google.com"
+  npx tab-agent setup
+  npx tab-agent snapshot
+  npx tab-agent click e5
+  npx tab-agent type e3 "hello world"
+  npx tab-agent navigate "https://google.com"
 
 Version: ${require('../package.json').version}
 `);
+  if (typeof exitCode === 'number') {
+    process.exit(exitCode);
+  }
   if (command && command !== 'help' && command !== '--help' && command !== '-h') {
     process.exit(1);
   }
