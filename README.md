@@ -84,7 +84,7 @@ npx tab-agent@latest status
 
 # 5. Activate & go
 # Click extension icon on any tab (turns green)
-# Ask your agent: "Search Amazon for mechanical keyboards and find the best rated"
+# Ask your agent: "Use Tab Agent to search Amazon for mechanical keyboards and find the best-rated options"
 ```
 
 If you have an older cached `npx` install, keep using `@latest` for `setup`, `start`, and `status` so the CLI/runtime matches the current extension release.
