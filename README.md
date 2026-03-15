@@ -6,7 +6,7 @@
 [![Chrome](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white)](https://github.com/DrHB/tab-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Let Claude & Codex browse as YOU** — uses your existing logins, click-to-activate security.
+**Let Claude, Codex, local agents, or your own tools browse as YOU** — uses your existing logins with click-to-activate security.
 
 > No headless browser. No re-authenticating. Your AI uses your actual Chrome sessions.
 >
@@ -14,8 +14,8 @@
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Claude Code    │────▶│  Relay Server   │────▶│    Extension    │
-│    or Codex     │◀────│   (background)  │◀────│    (Chrome)     │
+│ Shell-capable   │────▶│  Relay Server   │────▶│    Extension    │
+│   AI / Agent    │◀────│   (background)  │◀────│    (Chrome)     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                        │
                                                        ▼
@@ -44,7 +44,7 @@ Tab Agent is different — it uses your real Chrome with your real cookies:
 +---------------+--------------------------------------+----------------------------------+
 ```
 
-**Use Tab Agent when:** Claude or Codex needs to browse as "you" — shopping with your Prime account, checking your GitHub notifications, using sites you're already logged into.
+**Use Tab Agent when:** your AI agent needs to browse as "you" — shopping with your Prime account, checking your GitHub notifications, using sites you're already logged into.
 
 **Use headless browsers when:** CI/CD automation, web scraping, or testing with fresh sessions.
 
@@ -55,8 +55,14 @@ Tab Agent is different — it uses your real Chrome with your real cookies:
 - **Runs in background** — run `npx tab-agent@latest start` once, then use commands while it stays running
 - **Click-to-activate security** — only tabs you explicitly enable, others stay private
 - **AI-optimized snapshots** — pages converted to text with refs `[e1]`, `[e2]` for easy targeting
-- **Works with Claude Code & Codex** — installs skills automatically
+- **Works with Claude Code, Codex, and other shell-capable agents** — the browser control layer is plain CLI/WebSocket, with bundled skills for Claude Code and Codex
 - **Auto-launches Chrome** — starts Chrome with profile selection if not already running
+
+## What Tab Agent Is
+
+- **Tab Agent is the browser-control layer, not the reasoning model** — pair it with Claude Code, Codex, OpenCode, Goose, or your own local agent
+- **Anyone can run it** — if you can run Node.js and Chrome/Brave/Edge/Chromium, you can use Tab Agent
+- **It can be fully local on the model side** — Tab Agent is MIT-licensed and free; for a fully local/free stack, pair it with your preferred local model or agent
 
 ## Quick Start
 
@@ -78,7 +84,7 @@ npx tab-agent@latest status
 
 # 5. Activate & go
 # Click extension icon on any tab (turns green)
-# Ask Claude/Codex: "Search Amazon for mechanical keyboards and find the best rated"
+# Ask your agent: "Search Amazon for mechanical keyboards and find the best rated"
 ```
 
 If you have an older cached `npx` install, keep using `@latest` for `setup`, `start`, and `status` so the CLI/runtime matches the current extension release.
