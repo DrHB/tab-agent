@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.1] - 2026-03-15
+
+### Fixed
+- `setup` now installs the native host into a stable user-library location instead of pointing Chrome at the repo checkout
+- Native host installation now copies the `ws` dependency from the packaged install, so fresh npm installs can launch reliably
+- Relay server now accepts the current Chrome native-host client identifier, fixing cases where Chrome was connected but commands could not see an active browser
+
+### Docs
+- README now treats `status` as part of the setup flow and documents the native-host recovery steps that go with the new install path
+
 ## [0.4.0] - 2026-03-14
 
 ### Added

@@ -73,22 +73,34 @@ function installNativeHost(extensionId) {
   const packageDir = path.dirname(__dirname);
 
   let manifestDir;
+  let hostDir;
   let wrapperName;
 
   if (platform === 'darwin') {
     manifestDir = path.join(home, 'Library/Application Support/Google/Chrome/NativeMessagingHosts');
+    hostDir = path.join(home, 'Library/Application Support/TabAgent');
     wrapperName = 'native-host-wrapper.sh';
   } else if (platform === 'linux') {
     manifestDir = path.join(home, '.config/google-chrome/NativeMessagingHosts');
+    hostDir = path.join(home, '.config/tab-agent');
     wrapperName = 'native-host-wrapper.sh';
   } else if (platform === 'win32') {
     manifestDir = path.join(home, 'AppData/Local/Google/Chrome/User Data/NativeMessagingHosts');
+    hostDir = path.join(home, 'AppData/Local/TabAgent');
     wrapperName = 'native-host-wrapper.cmd';
   }
 
   fs.mkdirSync(manifestDir, { recursive: true });
+  fs.mkdirSync(hostDir, { recursive: true });
 
-  const wrapperPath = path.join(packageDir, 'relay', wrapperName);
+  const relayDir = path.join(packageDir, 'relay');
+  const wrapperPath = path.join(hostDir, wrapperName);
+  const hostScriptPath = path.join(hostDir, 'native-host.js');
+
+  fs.copyFileSync(path.join(relayDir, 'native-host.js'), hostScriptPath);
+  fs.copyFileSync(path.join(relayDir, wrapperName), wrapperPath);
+  installHostDependency(packageDir, hostDir);
+
   const manifest = {
     name: 'com.tabagent.relay',
     description: 'Tab Agent Native Messaging Host',
@@ -103,6 +115,7 @@ function installNativeHost(extensionId) {
   // Make wrapper executable (Unix only)
   if (platform !== 'win32') {
     fs.chmodSync(wrapperPath, '755');
+    fs.chmodSync(hostScriptPath, '755');
   }
 
   // Windows: also set registry key
@@ -111,6 +124,34 @@ function installNativeHost(extensionId) {
     const regPath = 'HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\com.tabagent.relay';
     execSync(`reg add "${regPath}" /ve /t REG_SZ /d "${manifestPath}" /f`);
   }
+}
+
+function installHostDependency(packageDir, hostDir) {
+  const wsSourceDir = findWsSourceDir(packageDir);
+  const nodeModulesDir = path.join(hostDir, 'node_modules');
+  const wsTargetDir = path.join(nodeModulesDir, 'ws');
+
+  fs.mkdirSync(nodeModulesDir, { recursive: true });
+  fs.rmSync(wsTargetDir, { recursive: true, force: true });
+  fs.cpSync(wsSourceDir, wsTargetDir, { recursive: true });
+}
+
+function findWsSourceDir(packageDir) {
+  const candidates = [
+    path.join(packageDir, 'node_modules', 'ws'),
+    path.join(packageDir, 'relay', 'node_modules', 'ws')
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(path.join(candidate, 'package.json'))) {
+      return candidate;
+    }
+  }
+
+  const resolved = require.resolve('ws/package.json', {
+    paths: [packageDir, path.join(packageDir, 'relay')]
+  });
+  return path.dirname(resolved);
 }
 
 function installSkills() {

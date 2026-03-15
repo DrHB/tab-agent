@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tab Agent",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Secure browser control for Claude, Codex, ChatGPT, and other AI tools",
   "permissions": [
     "activeTab",

@@ -73,12 +73,15 @@ npx tab-agent@latest setup
 # 3. Start relay
 npx tab-agent@latest start
 
-# 4. Activate & go
+# 4. Verify wiring
+npx tab-agent@latest status
+
+# 5. Activate & go
 # Click extension icon on any tab (turns green)
 # Ask Claude/Codex: "Search Amazon for mechanical keyboards and find the best rated"
 ```
 
-If you have an older cached `npx` install, keep using `@latest` for `setup` and `start` so the CLI/runtime matches the current extension release.
+If you have an older cached `npx` install, keep using `@latest` for `setup`, `start`, and `status` so the CLI/runtime matches the current extension release.
 
 <p align="center">
   <img src="assets/toggle-demo.gif" alt="Pin extension and toggle on/off" width="600">
@@ -172,7 +175,7 @@ cd tab-agent
 npx tab-agent@latest setup
 ```
 
-This auto-detects unpacked and installed Tab Agent extensions, installs the native host, and configures everything.
+This auto-detects unpacked and installed Tab Agent extensions, copies the native host into a stable per-user directory, and configures everything.
 
 ### 3. Start Relay
 
@@ -182,7 +185,19 @@ npx tab-agent@latest start
 
 Keep this running in a terminal while you use `tab-agent` commands.
 
-### 4. Activate Tabs
+### 4. Check Status
+
+```bash
+npx tab-agent@latest status
+```
+
+Confirm that all three pieces are healthy before you start driving the browser:
+
+- Native Host: Installed
+- Extension: Detected
+- Relay Server: Running
+
+### 5. Activate Tabs
 
 Click the Tab Agent icon on any tab you want to control. Green = active.
 
@@ -288,10 +303,16 @@ npx tab-agent tabs
 **Commands not working?**
 - Make sure relay is running: `npx tab-agent@latest start`
 - Click the extension icon — must show green "ON"
-- Run `npx tab-agent status` to check configuration
+- Run `npx tab-agent@latest status` to check configuration
+
+**Popup says "Native host has exited"?**
+- Make sure the relay is running: `npx tab-agent@latest start`
+- Reload the extension in `chrome://extensions`
+- Run `npx tab-agent@latest status` to confirm the native host path and relay status
+- If the extension ID changed, run `npx tab-agent@latest setup` again so Chrome is paired to the current extension
 
 **Fresh machine install still acting like an older release?**
-- Use `npx tab-agent@latest setup` and `npx tab-agent@latest start` to bypass stale cached `npx` installs
+- Use `npx tab-agent@latest setup`, `npx tab-agent@latest start`, and `npx tab-agent@latest status` to bypass stale cached `npx` installs
 - Make sure the unpacked extension and the CLI/runtime come from the same release family
 
 **No active tabs?**

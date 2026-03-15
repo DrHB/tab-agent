@@ -91,8 +91,8 @@ function failPendingRequests(reason, browser) {
 
 wss.on('connection', (ws, req) => {
   const clientType = req.headers['x-client-type'];
-  // 'extension' means chrome for backwards compatibility, 'safari' means safari
-  const isExtension = clientType === 'extension' || clientType === 'safari';
+  // 'extension' is the legacy chrome client name, 'chrome' is the current one.
+  const isExtension = clientType === 'extension' || clientType === 'chrome' || clientType === 'safari';
   const browser = clientType === 'safari' ? 'safari' : 'chrome';
 
   if (isExtension) {

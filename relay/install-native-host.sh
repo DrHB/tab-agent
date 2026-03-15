@@ -3,18 +3,19 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 HOST_NAME="com.tabagent.relay"
-HOST_DIR="$HOME/Library/Application Support/TabAgent"
-WRAPPER_PATH="$HOST_DIR/native-host-wrapper.sh"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   MANIFEST_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
+  HOST_DIR="$HOME/Library/Application Support/TabAgent"
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   MANIFEST_DIR="$HOME/.config/google-chrome/NativeMessagingHosts"
+  HOST_DIR="$HOME/.config/tab-agent"
 else
   echo "Unsupported OS: $OSTYPE"
   exit 1
 fi
 
+WRAPPER_PATH="$HOST_DIR/native-host-wrapper.sh"
 mkdir -p "$MANIFEST_DIR"
 
 if [ -z "$1" ]; then
@@ -26,8 +27,13 @@ fi
 
 EXTENSION_ID="$1"
 
-if [ ! -d "$SCRIPT_DIR/node_modules/ws" ]; then
-  echo "Dependencies missing: run 'npm install' in $SCRIPT_DIR first."
+WS_SOURCE_DIR=""
+if [ -d "$SCRIPT_DIR/../node_modules/ws" ]; then
+  WS_SOURCE_DIR="$SCRIPT_DIR/../node_modules/ws"
+elif [ -d "$SCRIPT_DIR/node_modules/ws" ]; then
+  WS_SOURCE_DIR="$SCRIPT_DIR/node_modules/ws"
+else
+  echo "Dependencies missing: run 'npm install' in the package root first."
   exit 1
 fi
 
@@ -35,7 +41,8 @@ mkdir -p "$HOST_DIR"
 rm -rf "$HOST_DIR/node_modules"
 cp "$SCRIPT_DIR/native-host.js" "$HOST_DIR/native-host.js"
 cp "$SCRIPT_DIR/native-host-wrapper.sh" "$HOST_DIR/native-host-wrapper.sh"
-cp -R "$SCRIPT_DIR/node_modules" "$HOST_DIR/node_modules"
+mkdir -p "$HOST_DIR/node_modules"
+cp -R "$WS_SOURCE_DIR" "$HOST_DIR/node_modules/ws"
 
 cat > "$MANIFEST_DIR/$HOST_NAME.json" << EOF
 {
