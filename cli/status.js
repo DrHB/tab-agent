@@ -3,6 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const http = require('http');
+const { findTabAgentExtension } = require('./detect-extension');
+
+const PACKAGE_VERSION = require('../package.json').version;
 
 function checkRelayServer() {
   return new Promise((resolve) => {
@@ -27,7 +30,7 @@ function checkRelayServer() {
 }
 
 async function status() {
-  console.log('Tab Agent Status\n');
+  console.log(`Tab Agent Status v${PACKAGE_VERSION}\n`);
 
   // Check native host
   const home = os.homedir();
@@ -46,8 +49,26 @@ async function status() {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     console.log('Native Host: Installed');
     console.log(`  Extension: ${manifest.allowed_origins[0]}`);
+    console.log(`  Path: ${manifest.path}`);
   } else {
-    console.log('Native Host: Not installed (run: npx tab-agent setup)');
+    console.log('Native Host: Not installed (run: npx tab-agent@latest setup)');
+  }
+
+  const extension = findTabAgentExtension();
+  if (extension) {
+    console.log('\nExtension: Detected');
+    console.log(`  ID: ${extension.extId}`);
+    if (extension.version) {
+      console.log(`  Version: ${extension.version}`);
+    }
+    if (extension.profile) {
+      console.log(`  Profile: ${extension.profile}`);
+    }
+    if (extension.path) {
+      console.log(`  Path: ${extension.path}`);
+    }
+  } else {
+    console.log('\nExtension: Not detected');
   }
 
   // Check skills
@@ -76,7 +97,7 @@ async function status() {
   if (relayStatus.running) {
     console.log(`  Status: Running (${relayStatus.clients} client${relayStatus.clients !== 1 ? 's' : ''})`);
   } else {
-    console.log('  Status: Not running (start with: npx tab-agent start)');
+    console.log('  Status: Not running (start with: npx tab-agent@latest start)');
   }
 }
 

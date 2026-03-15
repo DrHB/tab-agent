@@ -52,7 +52,7 @@ Tab Agent is different — it uses your real Chrome with your real cookies:
 
 - **Full browser control** — navigate, click, type, scroll, hover, drag, screenshot, PDF, run JavaScript
 - **Uses your login sessions** — access GitHub, Gmail, Amazon without sharing credentials
-- **Runs in background** — run `npx tab-agent start` once, then use commands while it stays running
+- **Runs in background** — run `npx tab-agent@latest start` once, then use commands while it stays running
 - **Click-to-activate security** — only tabs you explicitly enable, others stay private
 - **AI-optimized snapshots** — pages converted to text with refs `[e1]`, `[e2]` for easy targeting
 - **Works with Claude Code & Codex** — installs skills automatically
@@ -61,20 +61,24 @@ Tab Agent is different — it uses your real Chrome with your real cookies:
 ## Quick Start
 
 ```bash
-# 1. Install extension
+# 1. Get the extension files
 git clone https://github.com/DrHB/tab-agent
+cd tab-agent
 # Chrome: chrome://extensions → Developer mode → Load unpacked → select extension/
+# The extension/ folder must contain manifest.json
 
 # 2. Setup
-npx tab-agent setup
+npx tab-agent@latest setup
 
 # 3. Start relay
-npx tab-agent start
+npx tab-agent@latest start
 
 # 4. Activate & go
 # Click extension icon on any tab (turns green)
 # Ask Claude/Codex: "Search Amazon for mechanical keyboards and find the best rated"
 ```
+
+If you have an older cached `npx` install, keep using `@latest` for `setup` and `start` so the CLI/runtime matches the current extension release.
 
 <p align="center">
   <img src="assets/toggle-demo.gif" alt="Pin extension and toggle on/off" width="600">
@@ -153,25 +157,27 @@ npx tab-agent storage clear           # Clear localStorage
 
 ```bash
 git clone https://github.com/DrHB/tab-agent
+cd tab-agent
 ```
 
 1. Open `chrome://extensions`
 2. Enable **Developer mode** (top right)
 3. Click **Load unpacked**
 4. Select the `extension/` folder
+5. Confirm the folder contains `extension/manifest.json`
 
 ### 2. Run Setup
 
 ```bash
-npx tab-agent setup
+npx tab-agent@latest setup
 ```
 
-This auto-detects your extension and configures everything.
+This auto-detects unpacked and installed Tab Agent extensions, installs the native host, and configures everything.
 
 ### 3. Start Relay
 
 ```bash
-npx tab-agent start
+npx tab-agent@latest start
 ```
 
 Keep this running in a terminal while you use `tab-agent` commands.
@@ -182,7 +188,7 @@ Click the Tab Agent icon on any tab you want to control. Green = active.
 
 ## Auto-Launch Chrome
 
-When you run `npx tab-agent start`, Chrome is automatically launched if it's not already running. You'll be prompted to select which Chrome profile to use:
+When you run `npx tab-agent@latest start`, Chrome is automatically launched if it's not already running. You'll be prompted to select which Chrome profile to use:
 
 ```
 Chrome is not running.
@@ -200,8 +206,8 @@ Select profile [1-3]:
 Skip the prompt with the `--profile` flag:
 
 ```bash
-npx tab-agent start --profile="Profile 1"
-npx tab-agent start --profile="Work"
+npx tab-agent@latest start --profile="Profile 1"
+npx tab-agent@latest start --profile="Work"
 ```
 
 The flag matches by profile name or directory name (case-insensitive). If Chrome is already running, the prompt is skipped entirely.
@@ -220,7 +226,7 @@ The flag matches by profile name or directory name (case-insensitive). If Chrome
 
 1. **Start the relay server** (in a terminal):
    ```bash
-   npx tab-agent start
+   npx tab-agent@latest start
    ```
 
 2. **Open the Safari Swift package in Xcode**:
@@ -277,11 +283,16 @@ npx tab-agent tabs
 **Extension not detected?**
 - Make sure Developer mode is enabled in chrome://extensions
 - Reload the extension
+- Run `npx tab-agent@latest setup` again after reloading so the native host is paired to the current extension ID
 
 **Commands not working?**
-- Make sure relay is running: `npx tab-agent start`
+- Make sure relay is running: `npx tab-agent@latest start`
 - Click the extension icon — must show green "ON"
 - Run `npx tab-agent status` to check configuration
+
+**Fresh machine install still acting like an older release?**
+- Use `npx tab-agent@latest setup` and `npx tab-agent@latest start` to bypass stale cached `npx` installs
+- Make sure the unpacked extension and the CLI/runtime come from the same release family
 
 **No active tabs?**
 - Activate at least one tab by clicking the extension icon
@@ -289,7 +300,7 @@ npx tab-agent tabs
 ## How It Works
 
 1. **Chrome Extension** — Injects into activated tabs, captures DOM snapshots
-2. **Relay Server** — Bridges AI ↔ Extension via native messaging (run with `npx tab-agent start`)
+2. **Relay Server** — Bridges AI ↔ Extension via native messaging (run with `npx tab-agent@latest start`)
 3. **CLI** — Simple commands for Claude Code and Codex
 
 ```

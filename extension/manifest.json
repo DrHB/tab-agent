@@ -1,1 +1,41 @@
-manifest.chrome.json
+{
+  "manifest_version": 3,
+  "name": "Tab Agent",
+  "version": "0.4.0",
+  "description": "Secure browser control for Claude, Codex, ChatGPT, and other AI tools",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "nativeMessaging",
+    "debugger"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Tab Agent - Click to manage",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["snapshot.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

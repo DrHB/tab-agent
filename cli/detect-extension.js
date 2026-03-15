@@ -3,8 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+const PREF_FILES = ['Secure Preferences', 'Preferences'];
+
 // Support multiple browsers: Chrome, Brave, Edge, Chromium
-function getAllBrowserExtensionPaths() {
+function getBrowserRoots() {
   const platform = os.platform();
   const home = os.homedir();
   const paths = [];
@@ -35,24 +37,99 @@ function getAllBrowserExtensionPaths() {
     );
   }
 
-  // Expand to include Default and Profile N directories
-  const expandedPaths = [];
-  for (const browserPath of paths) {
+  return paths;
+}
+
+function getAllBrowserProfileDirs() {
+  const profileDirs = [];
+
+  for (const browserPath of getBrowserRoots()) {
     if (!fs.existsSync(browserPath)) continue;
 
     const profiles = ['Default', ...fs.readdirSync(browserPath).filter(f => f.startsWith('Profile '))];
     for (const profile of profiles) {
-      const extPath = path.join(browserPath, profile, 'Extensions');
-      if (fs.existsSync(extPath)) {
-        expandedPaths.push(extPath);
+      const profileDir = path.join(browserPath, profile);
+      if (fs.existsSync(profileDir)) {
+        profileDirs.push({ browserPath, profileDir, profile });
       }
+    }
+  }
+
+  return profileDirs;
+}
+
+function getAllBrowserExtensionPaths() {
+  const expandedPaths = [];
+  for (const { profileDir } of getAllBrowserProfileDirs()) {
+    const extPath = path.join(profileDir, 'Extensions');
+    if (fs.existsSync(extPath)) {
+      expandedPaths.push(extPath);
     }
   }
 
   return expandedPaths;
 }
 
+function readJson(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (e) {
+    return null;
+  }
+}
+
+function readExtensionManifest(extensionPath) {
+  if (!extensionPath) return null;
+
+  for (const filename of ['manifest.json', 'manifest.chrome.json']) {
+    const manifestPath = path.join(extensionPath, filename);
+    if (fs.existsSync(manifestPath)) {
+      const manifest = readJson(manifestPath);
+      if (manifest) return manifest;
+    }
+  }
+
+  return null;
+}
+
+function isTabAgentManifest(manifest) {
+  return manifest?.name === 'Tab Agent';
+}
+
+function findTabAgentFromPreferences() {
+  for (const { browserPath, profileDir, profile } of getAllBrowserProfileDirs()) {
+    for (const prefFile of PREF_FILES) {
+      const prefs = readJson(path.join(profileDir, prefFile));
+      const settings = prefs?.extensions?.settings;
+      if (!settings) continue;
+
+      for (const [extId, info] of Object.entries(settings)) {
+        const manifest = isTabAgentManifest(info.manifest)
+          ? info.manifest
+          : readExtensionManifest(info.path);
+
+        if (!isTabAgentManifest(manifest)) continue;
+
+        return {
+          extId,
+          browser: path.join(profileDir, 'Extensions'),
+          browserPath,
+          profile,
+          path: info.path || null,
+          source: 'preferences',
+          version: manifest.version || info.service_worker_registration_info?.version || null
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
 function findTabAgentExtension() {
+  const unpacked = findTabAgentFromPreferences();
+  if (unpacked) return unpacked;
+
   const extensionPaths = getAllBrowserExtensionPaths();
 
   for (const extPath of extensionPaths) {
@@ -68,12 +145,16 @@ function findTabAgentExtension() {
         for (const version of versions) {
           const manifestPath = path.join(extDir, version, 'manifest.json');
           if (fs.existsSync(manifestPath)) {
-            try {
-              const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-              if (manifest.name === 'Tab Agent') {
-                return { extId, browser: extPath };
-              }
-            } catch (e) {}
+            const manifest = readJson(manifestPath);
+            if (isTabAgentManifest(manifest)) {
+              return {
+                extId,
+                browser: extPath,
+                path: path.join(extDir, version),
+                source: 'extensions-dir',
+                version: manifest.version || version
+              };
+            }
           }
         }
       }
@@ -127,5 +208,6 @@ module.exports = {
   findTabAgentExtension,
   checkExistingManifest,
   promptForExtensionId,
-  getAllBrowserExtensionPaths
+  getAllBrowserExtensionPaths,
+  getAllBrowserProfileDirs
 };

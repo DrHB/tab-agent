@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Tab Agent",
-  "version": "0.1.0",
-  "description": "Browser control for Claude Code and Codex via WebSocket",
+  "version": "0.4.0",
+  "description": "Secure browser control for Claude, Codex, ChatGPT, and other AI tools",
   "permissions": [
     "activeTab",
     "scripting",

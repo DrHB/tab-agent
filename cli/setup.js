@@ -16,6 +16,12 @@ async function setup() {
   if (found) {
     extensionId = found.extId;
     console.log(`✓ Found extension: ${extensionId}`);
+    if (found.profile) {
+      console.log(`  Profile: ${found.profile}`);
+    }
+    if (found.path) {
+      console.log(`  Path: ${found.path}`);
+    }
   } else {
     extensionId = checkExistingManifest();
     if (extensionId) {
@@ -56,7 +62,7 @@ async function setup() {
 
   console.log('\n✓ Setup complete!\n');
   console.log('Usage:');
-  console.log('  1. Start relay server: npx tab-agent start');
+  console.log('  1. Start relay server: npx tab-agent@latest start');
   console.log('  2. Click Tab Agent icon on any tab (turns green)');
   console.log('  3. Ask Claude/Codex: "Use tab-agent to search Google"');
 }

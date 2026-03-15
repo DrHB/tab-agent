@@ -8,6 +8,8 @@ async function init() {
   currentTabId = tab.id;
 
   document.getElementById('currentUrl').textContent = tab.url;
+  document.getElementById('footer').textContent =
+    `ws://localhost:9876 | v${chrome.runtime.getManifest().version}`;
 
   await refreshActivatedTabs();
   updateActivateButton();
