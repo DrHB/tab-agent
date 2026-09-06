@@ -29,13 +29,24 @@ const httpServer = http.createServer((req, res) => {
 /**
  * Gate the WebSocket handshake before any command can be routed.
  *
- * Every client must present the token from the config file, which only the
- * local user can read.
+ * Two independent checks:
+ *  - a handshake carrying an Origin comes from a web page. Pages cannot set
+ *    request headers on a WebSocket and CORS does not apply to the handshake,
+ *    so without this a single malicious tab could drive every activated tab.
+ *  - everything else must present the token from the config file, which only
+ *    the local user can read.
  *
  * @param {{ req: http.IncomingMessage }} info - Handshake being verified.
  * @param {(ok: boolean, code?: number, message?: string) => void} done - ws callback.
  */
 function verifyClient(info, done) {
+  const origin = info.req.headers.origin;
+  if (origin) {
+    console.warn(`Rejected handshake from origin ${origin}`);
+    done(false, 403, 'Forbidden');
+    return;
+  }
+
   if (!tokenMatches(info.req.headers[TOKEN_HEADER], AUTH_TOKEN)) {
     console.warn('Rejected handshake with a missing or invalid token');
     done(false, 401, 'Unauthorized');
