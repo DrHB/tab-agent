@@ -1,8 +1,13 @@
 // relay/server.js
 const WebSocket = require('ws');
 const http = require('http');
+const { TOKEN_HEADER, ensureToken, tokenMatches } = require('./auth');
 
 const PORT = process.env.PORT || 9876;
+// Loopback only. The relay hands out full control of the user's browser, so it
+// must never be reachable from the local network.
+const HOST = '127.0.0.1';
+const AUTH_TOKEN = ensureToken();
 
 const httpServer = http.createServer((req, res) => {
   if (req.url === '/health') {
@@ -21,7 +26,37 @@ const httpServer = http.createServer((req, res) => {
   }
 });
 
-const wss = new WebSocket.Server({ server: httpServer });
+/**
+ * Gate the WebSocket handshake before any command can be routed.
+ *
+ * Two independent checks:
+ *  - a handshake carrying an Origin comes from a web page. Pages cannot set
+ *    request headers on a WebSocket and CORS does not apply to the handshake,
+ *    so without this a single malicious tab could drive every activated tab.
+ *  - everything else must present the token from the config file, which only
+ *    the local user can read.
+ *
+ * @param {{ req: http.IncomingMessage }} info - Handshake being verified.
+ * @param {(ok: boolean, code?: number, message?: string) => void} done - ws callback.
+ */
+function verifyClient(info, done) {
+  const origin = info.req.headers.origin;
+  if (origin) {
+    console.warn(`Rejected handshake from origin ${origin}`);
+    done(false, 403, 'Forbidden');
+    return;
+  }
+
+  if (!tokenMatches(info.req.headers[TOKEN_HEADER], AUTH_TOKEN)) {
+    console.warn('Rejected handshake with a missing or invalid token');
+    done(false, 401, 'Unauthorized');
+    return;
+  }
+
+  done(true);
+}
+
+const wss = new WebSocket.Server({ server: httpServer, verifyClient });
 
 // Store extension connections by browser type
 const connections = { chrome: null, safari: null };
@@ -208,9 +243,9 @@ wss.on('connection', (ws, req) => {
   }
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Tab Agent Relay running on ws://localhost:${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
+httpServer.listen(PORT, HOST, () => {
+  console.log(`Tab Agent Relay running on ws://${HOST}:${PORT}`);
+  console.log(`Health check: http://${HOST}:${PORT}/health`);
 });
 
 process.on('SIGINT', () => {

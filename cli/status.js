@@ -9,7 +9,7 @@ const PACKAGE_VERSION = require('../package.json').version;
 
 function checkRelayServer() {
   return new Promise((resolve) => {
-    const req = http.get('http://localhost:9876/health', (res) => {
+    const req = http.get('http://127.0.0.1:9876/health', (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {

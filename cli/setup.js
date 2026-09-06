@@ -98,6 +98,7 @@ function installNativeHost(extensionId) {
   const hostScriptPath = path.join(hostDir, 'native-host.js');
 
   fs.copyFileSync(path.join(relayDir, 'native-host.js'), hostScriptPath);
+  fs.copyFileSync(path.join(relayDir, 'auth.js'), path.join(hostDir, 'auth.js'));
   fs.copyFileSync(path.join(relayDir, wrapperName), wrapperPath);
   installHostDependency(packageDir, hostDir);
 

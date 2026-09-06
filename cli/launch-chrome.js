@@ -139,7 +139,9 @@ function loadConfig() {
 function saveConfig(config) {
   const existing = loadConfig();
   const merged = { ...existing, ...config };
-  fs.writeFileSync(getConfigPath(), JSON.stringify(merged, null, 2));
+  // The file also holds the relay token, so keep it readable by its owner only.
+  fs.writeFileSync(getConfigPath(), JSON.stringify(merged, null, 2), { mode: 0o600 });
+  fs.chmodSync(getConfigPath(), 0o600);
 }
 
 function getSavedProfile() {

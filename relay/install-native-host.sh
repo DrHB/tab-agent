@@ -40,6 +40,7 @@ fi
 mkdir -p "$HOST_DIR"
 rm -rf "$HOST_DIR/node_modules"
 cp "$SCRIPT_DIR/native-host.js" "$HOST_DIR/native-host.js"
+cp "$SCRIPT_DIR/auth.js" "$HOST_DIR/auth.js"
 cp "$SCRIPT_DIR/native-host-wrapper.sh" "$HOST_DIR/native-host-wrapper.sh"
 mkdir -p "$HOST_DIR/node_modules"
 cp -R "$WS_SOURCE_DIR" "$HOST_DIR/node_modules/ws"

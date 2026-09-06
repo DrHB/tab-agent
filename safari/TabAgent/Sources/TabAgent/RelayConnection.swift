@@ -19,7 +19,8 @@ class RelayConnection: NSObject {
         }
     }
 
-    private let relayURL = URL(string: "ws://localhost:9876")!
+    private let relayURL = URL(string: "ws://127.0.0.1:9876")!
+    private let tokenHeader = "x-tab-agent-token"
     private var reconnectTimer: Timer?
 
     override init() {
@@ -27,13 +28,38 @@ class RelayConnection: NSObject {
         urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
     }
 
+    /// Read the relay token the server persists in ~/.tab-agent.json.
+    ///
+    /// - Returns: The token, or nil when the relay has never been started.
+    private func loadToken() -> String? {
+        let configURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".tab-agent.json")
+
+        guard let data = try? Data(contentsOf: configURL),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let token = json["token"] as? String,
+              !token.isEmpty else {
+            return nil
+        }
+        return token
+    }
+
     func connect() {
         guard status != .connecting && status != .connected else { return }
+
+        // The relay writes the token before it starts listening, so a missing
+        // token means it is not running yet: retry rather than fail for good.
+        guard let token = loadToken() else {
+            status = .error("Relay not started")
+            handleDisconnect()
+            return
+        }
 
         status = .connecting
 
         var request = URLRequest(url: relayURL)
         request.setValue("safari", forHTTPHeaderField: "x-client-type")
+        request.setValue(token, forHTTPHeaderField: tokenHeader)
 
         webSocket = urlSession.webSocketTask(with: request)
         webSocket?.resume()

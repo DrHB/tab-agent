@@ -340,6 +340,18 @@ Claude → npx tab-agent navigate "google.com/flights"
     → ...
 ```
 
+## Security
+
+The relay is the only way in, and it is deliberately narrow:
+
+- **Loopback only** - the relay binds `127.0.0.1`, so nothing else on your network can reach it
+- **Token-authenticated** - on first start the relay writes a random token to `~/.tab-agent.json` (mode `0600`), and every client, including the extension's native host, must present it to connect
+- **No handshake from a web page** - connections carrying an `Origin` header are refused, so a page you happen to visit cannot open a socket to the relay and drive your tabs
+- **Click-to-activate** - commands only reach tabs you enabled. `evaluate` runs arbitrary JavaScript in the page, so only activate tabs you would hand to the agent yourself
+- **Redacted audit log** - the extension keeps the last 1000 actions without the data they carried: no typed text, scripts, screenshots, or cookie and storage values
+
+Deleting `~/.tab-agent.json` is a valid panic button: restart the relay and a fresh token is generated, then clients reconnect on their own.
+
 ## License
 
 MIT

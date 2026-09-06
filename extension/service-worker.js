@@ -107,13 +107,42 @@ async function autoActivateExistingTabs() {
   }
 }
 
+// Fields carrying user secrets or page content. Typed text can be a password
+// or a 2FA code, evaluate scripts and snapshots embed whatever the page holds,
+// and cookies/storage reads return session material. The audit trail records
+// that an action happened, never the data it carried.
+const REDACTED_FIELDS = [
+  'text', 'value', 'values', 'script', 'promptText',
+  'result', 'screenshot', 'pdf', 'snapshot', 'html', 'cookies', 'storage',
+];
+
+/**
+ * Replace sensitive fields of an audit payload with a placeholder.
+ *
+ * @param {*} payload - Command parameters or command result.
+ * @returns {*} A shallow copy safe to persist, or the payload itself when it
+ *   is not a plain object.
+ */
+function redact(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return payload;
+  }
+  const safe = { ...payload };
+  for (const field of REDACTED_FIELDS) {
+    if (field in safe) {
+      safe[field] = '[redacted]';
+    }
+  }
+  return safe;
+}
+
 // Log all actions for audit trail
 function audit(action, data, result) {
   const entry = {
     timestamp: new Date().toISOString(),
     action,
-    data,
-    result,
+    data: redact(data),
+    result: redact(result),
   };
   state.auditLog.push(entry);
   // Keep last 1000 entries

@@ -10,7 +10,7 @@ Control browser tabs via CLI. User activates tabs via extension icon (green = ac
 ## Before First Command
 
 ```bash
-curl -s http://localhost:9876/health || (npx tab-agent start &)
+curl -s http://127.0.0.1:9876/health || (npx tab-agent start &)
 sleep 2
 ```
 

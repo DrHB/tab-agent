@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Security
+- Relay binds `127.0.0.1` instead of every interface, so it is no longer reachable from the local network
+- Relay requires a token on every client connection, generated on first start and stored in `~/.tab-agent.json` with mode `0600`
+- Relay refuses WebSocket handshakes carrying an `Origin` header, which stops a visited web page from connecting and driving activated tabs
+- Extension audit log no longer persists typed text, evaluate scripts, screenshots, PDFs, snapshots, or cookie and storage values
+
+### Added
+- `npm test` runs handshake tests for the relay
+
 ## [0.4.1] - 2026-03-15
 
 ### Fixed
