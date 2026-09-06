@@ -3,6 +3,9 @@ const WebSocket = require('ws');
 const http = require('http');
 
 const PORT = process.env.PORT || 9876;
+// Loopback only. The relay hands out full control of the user's browser, so it
+// must never be reachable from the local network.
+const HOST = '127.0.0.1';
 
 const httpServer = http.createServer((req, res) => {
   if (req.url === '/health') {
@@ -208,9 +211,9 @@ wss.on('connection', (ws, req) => {
   }
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Tab Agent Relay running on ws://localhost:${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
+httpServer.listen(PORT, HOST, () => {
+  console.log(`Tab Agent Relay running on ws://${HOST}:${PORT}`);
+  console.log(`Health check: http://${HOST}:${PORT}/health`);
 });
 
 process.on('SIGINT', () => {
