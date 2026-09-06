@@ -2,6 +2,7 @@
 // native-host.js
 const WebSocket = require('ws');
 const fs = require('fs');
+const { TOKEN_HEADER, readToken } = require('./auth');
 
 const LOG_PATH = process.env.TAB_AGENT_LOG || '';
 
@@ -73,10 +74,20 @@ function scheduleReconnect() {
 }
 
 function connectWebSocket() {
+  // The relay writes the token before it starts listening, so a missing token
+  // simply means it is not running yet: retry instead of giving up.
+  const token = readToken();
+  if (!token) {
+    log('No relay token available yet');
+    scheduleReconnect();
+    return;
+  }
+
   try {
-    ws = new WebSocket('ws://localhost:9876', {
+    ws = new WebSocket('ws://127.0.0.1:9876', {
       headers: {
-        'x-client-type': 'chrome'
+        'x-client-type': 'chrome',
+        [TOKEN_HEADER]: token
       }
     });
   } catch (error) {

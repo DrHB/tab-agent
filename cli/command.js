@@ -1,5 +1,6 @@
 // cli/command.js
 const WebSocket = require('ws');
+const { TOKEN_HEADER, readToken } = require('../relay/auth');
 
 const COMMANDS = ['tabs', 'snapshot', 'screenshot', 'click', 'type', 'fill', 'press', 'scroll', 'navigate', 'wait', 'evaluate', 'hover', 'select', 'drag', 'get', 'find', 'cookies', 'storage', 'pdf'];
 
@@ -31,7 +32,15 @@ async function runCommand(args) {
     process.exit(1);
   }
 
-  const ws = new WebSocket('ws://localhost:9876');
+  const token = readToken();
+  if (!token) {
+    console.error('No relay token found - is the relay running? Try: npx tab-agent start');
+    process.exit(1);
+  }
+
+  const ws = new WebSocket('ws://127.0.0.1:9876', {
+    headers: { [TOKEN_HEADER]: token }
+  });
 
   const timeout = setTimeout(() => {
     console.error('Connection timeout - is the relay running? Try: npx tab-agent start');

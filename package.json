@@ -19,6 +19,7 @@
     "extension/popup/",
     "extension/service-worker.js",
     "extension/snapshot.js",
+    "relay/auth.js",
     "relay/install-native-host.sh",
     "relay/native-host-wrapper.cmd",
     "relay/native-host-wrapper.sh",
